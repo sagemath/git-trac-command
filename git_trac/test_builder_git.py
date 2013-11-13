@@ -24,6 +24,8 @@ Build a new git repo for doctests
 
 POPULATE_GIT_REPO = """
 git init .
+git config --local --add trac.username trac_user
+git config --local --add trac.password trac_pass
 
 # create conflicting branches
 echo 'version 0' > file.txt

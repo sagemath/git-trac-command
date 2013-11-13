@@ -23,34 +23,62 @@ Container for Configuration Data
 
 
 import os
-import json
+import sys
 import logging
+
+from .git_error import GitError
 
 
 class Config(object):
 
-    def __init__(self):
-        self._load()
+    def __init__(self, git):
+        self._git = git
 
-    def _save(self):
-        pass
+    def _save(self, config_option, value):
+        if len(value.strip()) == 0:
+            self._git.config('--local', '--unset', config_option)
+        else:
+            self._git.config('--local', '--add', config_option, value)
 
-    def _load(self):
-        pass
+    def _load(self, config_option):
+        return self._git.config('--get', config_option).strip()
         
     @property
     def version(self):
         return 1
 
     @property
-    def trac_server_hostname(self):
+    def server_hostname(self):
         return 'http://trac.sagemath.org'
 
     @property
-    def trac_server_anonymous_xmlrpc(self):
+    def server_anonymous_xmlrpc(self):
         return 'xmlrpc'
 
     @property
-    def trac_server_authenticated_xmlrpc(self):
+    def server_authenticated_xmlrpc(self):
         return 'login/xmlrpc'
 
+    @property
+    def username(self):
+        try:
+            return self._load('trac.username')
+        except GitError:
+            print('Use "git trac config --user=<name>" to set your trac username')
+            sys.exit(1)
+
+    @username.setter
+    def username(self, value):
+        self._save('trac.username', value)
+
+    @property
+    def password(self):
+        try:
+            return self._load('trac.password')
+        except GitError:
+            print('Use "git trac config --pass=<secret>" to set your trac username')
+            sys.exit(1)
+
+    @password.setter
+    def password(self, value):
+        self._save('trac.password', value)

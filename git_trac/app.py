@@ -34,15 +34,48 @@ from .trac_server import TracServer
 class Application(object):
 
     def __init__(self):
-        self.config = c = Config()
-        self.trac = TracServer(c.trac_server_hostname,
-                               c.trac_server_anonymous_xmlrpc,
-                               c.trac_server_authenticated_xmlrpc)
         self.repo = GitRepository()
-        self.git = self.repo.git
+        self.git = git = self.repo.git
+        self.config = c = Config(git)
+        self.trac = TracServer(c.server_hostname,
+                               c.server_anonymous_xmlrpc,
+                               c.server_authenticated_xmlrpc)
 
+    def search(self, branch=None):
+        if branch is not None:
+            result = self.trac.search_branch(branch)
+            print(result)
+
+
+    def save_trac_username(self, username):
+        self.config.username = username
+
+    def save_trac_password(self, password):
+        self.config.password = password
         
-    def show_config(self):
-        print(self.config)
+    def print_config(self):
+        """
+        Print configuration information
 
+        EXAMPLES::
+
+            sage: app.print_config()
+            Trac xmlrpc URL:
+                http://trac.sagemath.org/xmlrpc (anonymous)
+                http://trac.sagemath.org/login/xmlrpc (authenticated)
+            Username: trac_user
+            Password: trac_pass
+        """
+        c = self.config
+        import urllib.parse
+        print('Trac xmlrpc URL:')
+        url_anon = urllib.parse.urljoin(c.server_hostname, 
+                                        c.server_anonymous_xmlrpc)
+        print('    {0} (anonymous)'.format(url_anon))
+        url_auth = urllib.parse.urljoin(c.server_hostname, 
+                                        c.server_authenticated_xmlrpc)
+        print('    {0} (authenticated)'.format(url_auth))
+        
+        print('Username: {0}'.format(c.username))
+        print('Password: {0}'.format(c.password))
 

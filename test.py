@@ -43,7 +43,13 @@ def testmod(module, verbose=False, globs={}):
 
 
 def test_trac_model():
-    pass
+    testmod('git_trac.trac_error')
+    from git_trac.test_builder import TestBuilder
+    test = TestBuilder()
+    app = test.make_app()
+    globs = {'test':test, 'app':app, 'trac':app.trac}
+    testmod('git_trac.trac_server', globs=globs)
+    
  
 
 def test_git_model():
@@ -51,7 +57,6 @@ def test_git_model():
     from git_trac.test_builder import TestBuilder
     cwd = os.getcwd()
     test = TestBuilder()
-
     try:
         os.chdir(test.repo_path)
         repo = test.make_repo(verbose=True, user_email_set=True)
@@ -64,12 +69,39 @@ def test_git_model():
     finally:
         os.chdir(cwd)
 
+def test_app():
+    from git_trac.test_builder import TestBuilder
+    cwd = os.getcwd()
+    test = TestBuilder()
+    try:
+        os.chdir(test.repo_path)
+        app = test.make_app()
+        globs = {'test':test, 'app':app}
+        testmod('git_trac.app', globs=globs)
+    finally:
+        os.chdir(cwd)
+
         
 def run_doctests():
     testmod('git_trac.doctest_parser')    
     test_trac_model()
     test_git_model()
+    test_app()
+
+
+def auto_run_tests():
+    import subprocess
+    while True:
+        subprocess.check_call(['inotifywait', '--recursive', 
+                               '--event', 'close_write', '.'])
+        print('Running doctests...')
+        subprocess.call(sys.argv[0])
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'auto':
+            auto_run_tests()
+        else:
+            raise ValueError('Usage: test.py auto')
     run_doctests()
 

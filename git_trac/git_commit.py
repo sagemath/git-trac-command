@@ -74,7 +74,7 @@ class GitCommit(object):
         """
         Return the list of (direct and indirect) parent commits
         """
-        master = self.repository.master.commit
+        master = self.repository.master
         result = []
         rev_list = self.repository.git.rev_list(
             self.sha1, '^'+master.sha1, format='oneline', max_count=limit)
@@ -84,7 +84,7 @@ class GitCommit(object):
             result.append(GitCommit(self.repository, sha1, title))
         result.append(master)
         return result
-        
+    
     def get_message(self, format='fuller'):
         """
         Return the log entry for the commit

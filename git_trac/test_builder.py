@@ -20,8 +20,12 @@ Build Stuff for Doctests
 ##############################################################################
 
 
-from .test_git import TestBuilderGit
+from .test_builder_git import TestBuilderGit
 
 
 class TestBuilder(TestBuilderGit):
-    pass
+
+    def make_app(self):
+        from .app import Application
+        return Application()
+

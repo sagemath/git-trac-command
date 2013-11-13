@@ -55,3 +55,28 @@ class TracServer(object):
         ticket = TracTicket(ticket_number, self.anonymous_proxy)
         return ticket
 
+    def search_branch(self, branch_name):
+        """
+        Return the trac ticket using the given (remote) branch
+        
+        INPUT:
+
+        - ``branch_name`` -- string. The name of a remote branch on
+          the trac git repo.
+        
+        OUTPUT:
+
+        The ticket number as an integer. A ``ValueError`` is raised if
+        no such ticket exists currently.
+
+        EXAMPLES::
+
+            sage: trac.search_branch('u/ohanar/build_system')
+            14480
+            sage: type(_)
+            <class 'int'>
+        """
+        branch = self.anonymous_proxy.search.branch(branch_name)
+        if len(branch) == 0:
+            raise ValueError('no such branch on a trac ticket')
+        return branch[0][0]

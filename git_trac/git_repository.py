@@ -44,7 +44,8 @@ class GitRepository(object):
 
     @property
     def master(self):
-        return GitCommit(self, 'master')
+        head = self.git.show_ref('master', head=True)
+        return GitCommit(self, head[0:40])
     
     @property
     def head(self):

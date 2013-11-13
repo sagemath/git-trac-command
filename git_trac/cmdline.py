@@ -67,7 +67,8 @@ def launch():
     parser_checkout.add_argument('ticket', type=int, help='Ticket number')
 
     parser_search = subparsers.add_parser('search', help='Search trac')
-    parser_search.add_argument('--branch', help='Branch name')
+    parser_search.add_argument('--branch', dest='search_branch', 
+                               help='Branch name', default=None)
 
     parser_pull = subparsers.add_parser('pull', help='Get updates')
     parser_pull.add_argument('ticket', nargs='?', type=int, 
@@ -82,6 +83,10 @@ def launch():
                                  help='Ticket number', default=None)
 
     parser_config = subparsers.add_parser('config', help='Configure git-trac')
+    parser_config.add_argument('--user', dest='trac_user', 
+                               help='Trac username', default=None)
+    parser_config.add_argument('--pass', dest='trac_pass', 
+                               help='Trac password', default=None)
 
     args = parser.parse_args()
 
@@ -99,11 +104,21 @@ def launch():
 
     if args.debug:
         debug_shell(app)
-    elif args.checkout:
+    elif args.subcommand == 'checkout':
         app.checkout(args.ticket)
-    elif args.pull:
-        app.checkout(args.ticket)
-    elif args.push:
-        app.checkout(args.ticket)
-    elif args.config:
-        app.show_config()
+    elif args.subcommand == 'pull':
+        app.pull(args.ticket)
+    elif args.subcommand == 'push':
+        app.push(args.ticket)
+    elif args.subcommand == 'search':
+        if any([args.search_branch]):
+            app.search(branch=args.search_branch)
+        else:
+            parser_search.print_help()
+            sys.exit(1)
+    elif args.subcommand == 'config':
+        if args.trac_user is not None:
+            app.save_trac_username(args.trac_user)
+        if args.trac_pass is not None:
+            app.save_trac_password(args.trac_pass)
+        app.print_config()
