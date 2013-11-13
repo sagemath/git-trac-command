@@ -6,7 +6,7 @@ About
 
 This module implements a "git trac" subcommand of the git suite that
 interfaces with trac over XMLRPC.
-
+ 
 
 Installation
 ------------
