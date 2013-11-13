@@ -35,9 +35,11 @@ class Config(object):
         self._git = git
 
     def _save(self, config_option, value):
-        if len(value.strip()) == 0:
-            self._git.config('--local', '--unset', config_option)
-        else:
+        try:
+            self._git.config('--local', '--unset-all', config_option)
+        except GitError:
+            pass
+        if len(value.strip()) != 0:
             self._git.config('--local', '--add', config_option, value)
 
     def _load(self, config_option):
@@ -64,8 +66,8 @@ class Config(object):
         try:
             return self._load('trac.username')
         except GitError:
-            print('Use "git trac config --user=<name>" to set your trac username')
-            sys.exit(1)
+            raise SystemExit('Use "git trac config --user=<name>"'
+                             ' to set your trac username')
 
     @username.setter
     def username(self, value):
@@ -76,8 +78,8 @@ class Config(object):
         try:
             return self._load('trac.password')
         except GitError:
-            print('Use "git trac config --pass=<secret>" to set your trac username')
-            sys.exit(1)
+            raise SystemExit('Use "git trac config --pass=<secret>"'
+                             ' to set your trac username')
 
     @password.setter
     def password(self, value):

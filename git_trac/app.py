@@ -44,7 +44,9 @@ class Application(object):
     def search(self, branch=None):
         if branch is not None:
             result = self.trac.search_branch(branch)
-            print(result)
+        else:
+            raise ValueError('search for what?')
+        print(result)
 
 
     def save_trac_username(self, username):

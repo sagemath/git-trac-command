@@ -14,5 +14,11 @@ except ImportError:
     from git_trac import cmdline
 
 if __name__ == '__main__':
-    cmdline.launch()
+    try:
+        cmdline.launch()
+    except ValueError as error:
+        print('Error: {0}'.format(error))
+    except SystemExit as msg:
+        if msg.code != 0:
+            print('{0}\nExiting.'.format(msg))
 
