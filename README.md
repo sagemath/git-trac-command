@@ -51,7 +51,8 @@ Usage
       ==============================================================================
   
 
-* Pull (= fetch + merge) from the branch on a ticket:
+* Pull (= fetch + merge) from the branch
+  on a ticket:
 
       $ git trac pull 12345
 
@@ -68,7 +69,8 @@ The scripts assume that the trac remote repository is set up as the
 remote ``trac`` in the local repo. That is, you should have the
 following for the Sage git server:
 
-    $ git remote add trac ssh://git@trac.sagemath.org/sage.git
+    $ git remote add trac http://trac.sagemath.org/sage.git      # read-only
+    $ git remote add trac ssh://git@trac.sagemath.org/sage.git   # read-write
     $ git remote -v
     trac	ssh://git@trac.sagemath.org/sage.git (fetch)
     trac	ssh://git@trac.sagemath.org/sage.git (push)
