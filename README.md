@@ -51,17 +51,37 @@ Usage
       ==============================================================================
   
 
-* Trac username and password are stored in the local repo (the
-  DOT_GIT/config file):
+* Pull (= fetch + merge) from the branch on a ticket:
+
+      $ git trac pull 12345
+
+  You can omit the ticket number, in which case the script will try to
+  search for the ticket having the local branch name attached. If that
+  fails, an attempt is made to deduce the ticket number from the local
+  branch name.
+
+
+Configuration
+-------------
+
+The scripts assume that the trac remote repository is set up as the
+remote ``trac`` in the local repo. That is, you should have the
+following for the Sage git server:
+
+    $ git remote add trac ssh://git@trac.sagemath.org/sage.git
+    $ git remote -v
+    trac	ssh://git@trac.sagemath.org/sage.git (fetch)
+    trac	ssh://git@trac.sagemath.org/sage.git (push)
+
+Trac username and password are stored in the local repo (the
+DOT_GIT/config file):
   
-      $ git trac config --user=Myself --pass=s3kr1t
-      Trac xmlrpc URL:
-          http://trac.sagemath.org/xmlrpc (anonymous)
-          http://trac.sagemath.org/login/xmlrpc (authenticated)
-      Username: Myself
-      Password: s3kr1t
-
-
+    $ git trac config --user=Myself --pass=s3kr1t
+    Trac xmlrpc URL:
+        http://trac.sagemath.org/xmlrpc (anonymous)
+        http://trac.sagemath.org/login/xmlrpc (authenticated)
+    Username: Myself
+    Password: s3kr1t
 
 
 Sage-Trac Specifics

@@ -55,6 +55,14 @@ class TracServer(object):
         ticket = TracTicket(ticket_number, self.anonymous_proxy)
         return ticket
 
+    def remote_branch(self, ticket_number):
+        ticket = self.load(ticket_number)
+        branch = ticket.branch
+        if branch == '':
+            raise ValueError('"Branch:" field is not set on ticket #'
+                             + str(ticket_number))
+        return branch
+
     def search_branch(self, branch_name):
         """
         Return the trac ticket using the given (remote) branch

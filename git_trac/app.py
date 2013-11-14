@@ -49,6 +49,11 @@ class Application(object):
         result = self.trac.search_branch(branch)
         print(result)
 
+    def pull(self, ticket_number):
+        remote = self.trac.remote_branch(ticket_number)
+        print('remote branch: '+remote)
+        self.repo.pull(remote)
+
     def guess_ticket_number(self, ticket):
         """
         Guess the ticket number
@@ -141,7 +146,7 @@ class Application(object):
             sage: app.print_ticket(1000)
             ==============================================================================
             Trac #1000: Sage does not have 10000 users yet.
-            
+            <BLANKLINE>            
             ADD DESCRIPTION
             Status: closed                          Component: distribution
             Last modified: 2013-10-05 21:16:12      Created: 2007-10-25 16:48:05 UTC
@@ -163,9 +168,9 @@ class Application(object):
             ------------------------------------------------------------------------------
             Comment #4 by was at 2007-12-10 17:29:52 UTC:
             We've made major progress toward this ticket so far with:
-            
+            <BLANKLINE>
             http://science.slashdot.org/article.pl?sid=07/12/08/1350258
-            
+            <BLANKLINE>
             We had nearly 5000 downloads this weekend.
             ------------------------------------------------------------------------------
             Comment #5 by was at 2008-01-09 06:16:42 UTC:
@@ -192,26 +197,13 @@ class Application(object):
             from google analytics shows that sage has stayed above 10,000 users -- by that
             metric -- every month for the last year.   However, just barely! There were
             only 11,530 unique returning visitors in July, 2013.
-            
+            <BLANKLINE>            
             For the record, the number of unique returning visitors per month for
             sagenb.org is between 3500 and 8000 over this same period.
-            
+            <BLANKLINE>            
             For https://cloud.sagemath.com, it's between 0 and 2856.
-            
+            <BLANKLINE>            
             (I hope having a description doesn't mess up the dev scripts!)
-            [_comment0] changed from Sense I made this ticket in the first place, I'm
-            going to make it meaningful by defining "number of users" to be "the number of
-            unique *returning* visitors to sagemath.org per month".   It's a well-defined
-            quantity, and it's not just some sort of pure vanity metric, because to count,
-            a user has to visit the site more than once (so temporary spikes due to news
-            don't count).  The data from google analytics shows that sage has stayed above
-            10,000 users -- by that metric -- every month for the last year.   However,
-            just barely! There were only 11,530 unique returning visitors in July, 2013.
-            
-            For the record, the number of unique returning visitors per month for
-            sagenb.org is between 3500 and 8000 over this same period.
-            
-            For https://cloud.sagemath.com, it's between 0 and 2856.  to 1381007772384687
             [Report Upstream] set to N/A
             ------------------------------------------------------------------------------
             Comment #10 by vbraun at 2013-10-05 20:57:50 UTC:

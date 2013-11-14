@@ -108,7 +108,8 @@ def launch():
     elif args.subcommand == 'checkout':
         app.checkout(args.ticket)
     elif args.subcommand == 'pull':
-        app.pull(args.ticket)
+        ticket_number = app.guess_ticket_number(args.ticket)
+        app.pull(ticket_number)
     elif args.subcommand == 'push':
         app.push(args.ticket)
     elif args.subcommand == 'get':

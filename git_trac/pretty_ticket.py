@@ -179,6 +179,9 @@ def format_ticket(ticket):
     for change_set in ticket.grouped_comment_iter():
         result.append(SEPARATOR_TEMPLATE.format(ticket=ticket))
         for change in change_set:
+            if change.change.startswith('_'):
+                # changed comments are returned like this
+                continue
             if change.old == '' and change.new == '' and change.change != 'comment':
                 continue
             if change.old == '':
