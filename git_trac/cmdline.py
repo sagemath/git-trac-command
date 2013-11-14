@@ -67,8 +67,9 @@ def launch():
     parser_checkout.add_argument('ticket', type=int, help='Ticket number')
 
     parser_search = subparsers.add_parser('search', help='Search trac')
-    parser_search.add_argument('--branch', dest='search_branch', 
-                               help='Remote git branch name', default=None)
+    parser_search.add_argument('--branch', dest='branch_name', 
+                               help='Remote git branch name (default: local branch)', 
+                               default=None)
 
     parser_pull = subparsers.add_parser('pull', help='Get updates')
     parser_pull.add_argument('ticket', nargs='?', type=int, 
@@ -110,9 +111,12 @@ def launch():
         app.pull(args.ticket)
     elif args.subcommand == 'push':
         app.push(args.ticket)
+    elif args.subcommand == 'get':
+        ticket_number = app.guess_ticket_number(args.ticket)
+        app.print_ticket(ticket_number)
     elif args.subcommand == 'search':
         try:
-            app.search(branch=args.search_branch)
+            app.search(branch=args.branch_name)
         except ValueError:
             parser_search.print_help()
             raise

@@ -24,11 +24,13 @@ global namespace.
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-
+import re
 
 from .config import Config
 from .git_repository import GitRepository
 from .trac_server import TracServer
+
+TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]+)[-_/]')
 
 
 class Application(object):
@@ -42,12 +44,60 @@ class Application(object):
                                c.server_authenticated_xmlrpc)
 
     def search(self, branch=None):
-        if branch is not None:
-            result = self.trac.search_branch(branch)
-        else:
-            raise ValueError('search for what?')
+        if branch is None:
+            branch = self.repo.current_branch()
+        result = self.trac.search_branch(branch)
         print(result)
 
+    def guess_ticket_number(self, ticket):
+        """
+        Guess the ticket number
+
+        INPUT:
+
+        - ``ticket`` -- anything (user input from the command line)
+
+        OUTPUT:
+
+        An integer. If no guess is available, a ``ValueError`` is
+        returned.
+
+        EXAMPLES::
+        
+            sage: app.repo.current_branch()
+            'public/1002/anything'
+            sage: app.guess_ticket_number(None)
+            1002
+            sage: app.guess_ticket_number(12345)
+            12345
+            sage: app.guess_ticket_number('u/user/1001/1_foo')
+            1001
+            sage: app.guess_ticket_number('u/user/description')
+            Traceback (most recent call last):
+            ...
+            ValueError: could not deduce ticket number from 
+            branch name "u/user/description"
+        """
+        try:
+            return int(ticket)
+        except (ValueError, TypeError):
+            pass
+        branch = None
+        if ticket is not None:
+            ticket = str(ticket)
+            if len(ticket) > 0:
+                branch = ticket
+        if branch is None:
+            branch = self.repo.current_branch()
+        try:
+            return self.trac.search_branch(branch)
+        except ValueError:
+            pass
+        match = TICKET_NUMBER_IN_BRANCH_REGEX.search(branch)
+        if match:
+            return int(match.groups()[0])
+        raise ValueError('could not deduce ticket number from branch'
+                         ' name "{0}"'.format(branch))
 
     def save_trac_username(self, username):
         self.config.username = username
@@ -77,7 +127,100 @@ class Application(object):
         url_auth = urllib.parse.urljoin(c.server_hostname, 
                                         c.server_authenticated_xmlrpc)
         print('    {0} (authenticated)'.format(url_auth))
-        
         print('Username: {0}'.format(c.username))
         print('Password: {0}'.format(c.password))
 
+    def print_ticket(self, ticket_number):
+        """
+        INPUT:
+
+        - ``ticket_number`` -- integer.
+
+        EXAMPLES:
+
+            sage: app.print_ticket(1000)
+            ==============================================================================
+            Trac #1000: Sage does not have 10000 users yet.
+            
+            ADD DESCRIPTION
+            Status: closed                          Component: distribution
+            Last modified: 2013-10-05 21:16:12      Created: 2007-10-25 16:48:05 UTC
+            Report upstream: N/A
+            Authors:
+            Reviewers:
+            Branch:
+            Keywords:
+            Dependencies:
+            ------------------------------------------------------------------------------
+            Comment #1 by was at 2007-10-25 16:50:15 UTC:
+            [Owner] changed from mabshoff to was
+            ------------------------------------------------------------------------------
+            Comment #2 by was at 2007-10-25 16:50:38 UTC:
+            [Status] changed from new to assigned
+            ------------------------------------------------------------------------------
+            Comment #3 by was at 2007-10-25 16:52:37 UTC:
+            [Milestone] set to sage-wishlist
+            ------------------------------------------------------------------------------
+            Comment #4 by was at 2007-12-10 17:29:52 UTC:
+            We've made major progress toward this ticket so far with:
+            
+            http://science.slashdot.org/article.pl?sid=07/12/08/1350258
+            
+            We had nearly 5000 downloads this weekend.
+            ------------------------------------------------------------------------------
+            Comment #5 by was at 2008-01-09 06:16:42 UTC:
+            I think we have 10000 users now based on downloads, etc.
+            [Resolution] set to fixed
+            [Status] changed from assigned to closed
+            ------------------------------------------------------------------------------
+            Comment #6 by mabshoff at 2008-01-10 08:28:40 UTC:
+            [Milestone] changed from sage-wishlist to sage-2.10
+            ------------------------------------------------------------------------------
+            Comment #7 by saraedum at 2013-07-25 14:50:51 UTC:
+            [Description] modified
+            ------------------------------------------------------------------------------
+            Comment #8 by vbraun at 2013-10-04 21:47:15 UTC:
+            [Changetime] changed from 20130725T14:50:51 to 20130725T14:50:51
+            [Description] modified
+            ------------------------------------------------------------------------------
+            Comment #9 by was at 2013-10-05 20:41:33 UTC:
+            I made this ticket in the first place, so I'm going to make it meaningful by
+            defining "number of users" to be "the number of unique *returning* visitors to
+            sagemath.org per month".   It's a well-defined quantity, and it's not just
+            some sort of pure vanity metric, because to count, a user has to visit the
+            site more than once (so temporary spikes due to news don't count).  The data
+            from google analytics shows that sage has stayed above 10,000 users -- by that
+            metric -- every month for the last year.   However, just barely! There were
+            only 11,530 unique returning visitors in July, 2013.
+            
+            For the record, the number of unique returning visitors per month for
+            sagenb.org is between 3500 and 8000 over this same period.
+            
+            For https://cloud.sagemath.com, it's between 0 and 2856.
+            
+            (I hope having a description doesn't mess up the dev scripts!)
+            [_comment0] changed from Sense I made this ticket in the first place, I'm
+            going to make it meaningful by defining "number of users" to be "the number of
+            unique *returning* visitors to sagemath.org per month".   It's a well-defined
+            quantity, and it's not just some sort of pure vanity metric, because to count,
+            a user has to visit the site more than once (so temporary spikes due to news
+            don't count).  The data from google analytics shows that sage has stayed above
+            10,000 users -- by that metric -- every month for the last year.   However,
+            just barely! There were only 11,530 unique returning visitors in July, 2013.
+            
+            For the record, the number of unique returning visitors per month for
+            sagenb.org is between 3500 and 8000 over this same period.
+            
+            For https://cloud.sagemath.com, it's between 0 and 2856.  to 1381007772384687
+            [Report Upstream] set to N/A
+            ------------------------------------------------------------------------------
+            Comment #10 by vbraun at 2013-10-05 20:57:50 UTC:
+            This ticket is used in the docs for the dev scripts, apologies for spamming...
+            (under normal use the doctests of course do not modify trac tickets)
+            ------------------------------------------------------------------------------
+            URL: http://trac.sagemath.org/1000
+            ==============================================================================
+        """
+        ticket = self.trac.load(ticket_number)
+        from .pretty_ticket import format_ticket
+        print(format_ticket(ticket))

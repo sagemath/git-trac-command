@@ -23,6 +23,34 @@ pointing to ``run.py``:
 Usage
 -----
 
+* Print the trac ticket information using ``git trac get
+  <ticket_number>``. 
+
+      $ git trac get 12345
+      ==============================================================================
+      Trac #12345: Title of ticket 12345
+      ...
+      ==============================================================================
+
+  Alternatively, you can pass a remote branch name, in which case trac
+  is searched for a ticket whose (remote) "Branch:" field equals the
+  branch name.  If that fails, the ticket number will be deduced from
+  the branch name by scanning for a number. If you neither specify a
+  ticket number or branch name, the local git branch name is used:
+
+      $ git branch
+      /u/user/description
+      $ git trac get
+      ==============================================================================
+      Trac #nnnnn: Title
+      <BLANKLINE>
+      Description
+      Status: Status                          Component: Component                
+      ...
+      Branch: u/user/description
+      ==============================================================================
+  
+
 * Trac username and password are stored in the local repo (the
   DOT_GIT/config file):
   
