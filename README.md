@@ -12,12 +12,17 @@ Installation
 ------------
 
 The easiest way to use the code from this repo is to clone it and
-create a symlink named ``git-trac`` somewhere in your path and
-pointing to ``run.py``:
+run ``setup.py``:
 
     $ git clone https://github.com/sagemath/git-trac-command.git
     $ cd git-trac-command
-    $ ln -s `pwd`/run.py ~/bin/git-trac
+    $ python setup.py install
+
+Alternatively you can symlink ``git-trac`` to somewhere in your path:
+
+    $ git clone https://github.com/sagemath/git-trac-command.git
+    $ cd git-trac-command
+    $ ln -s `pwd`/git-trac ~/bin/
 
 
 Usage
@@ -105,5 +110,3 @@ https://github.com/sagemath/sage_trac), namely:
       $ git trac ssh-keys
       $ git trac ssh-keys --add=~/.ssh/id_rsa.pub
       This is not implemented yet
-      
-      

@@ -1,0 +1,12 @@
+#/usr/bin/env python3
+
+from distutils.core import setup
+
+setup(
+        name='git_trac',
+        description='A "git trac" subcommand for git',
+        author='Volker Braun',
+        author_email='vbraun.name@gmail.com',
+        packages=['git_trac'],
+        scripts=['git-trac'],
+        )
