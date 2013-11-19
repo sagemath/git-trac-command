@@ -1,0 +1,3 @@
+include README* LICENSE*
+include git-trac *.py
+recursive-include git_trac *.py
