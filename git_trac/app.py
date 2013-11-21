@@ -39,9 +39,7 @@ class Application(object):
         self.repo = GitRepository()
         self.git = git = self.repo.git
         self.config = c = Config(git)
-        self.trac = TracServer(c.server_hostname,
-                               c.server_anonymous_xmlrpc,
-                               c.server_authenticated_xmlrpc)
+        self.trac = TracServer(c)
 
     def search(self, branch=None):
         if branch is None:
@@ -53,6 +51,48 @@ class Application(object):
         remote = self.trac.remote_branch(ticket_number)
         print('remote branch: '+remote)
         self.repo.pull(remote)
+
+    def suggest_remote_branch(self, template):
+        """
+        Return a remote branch name
+
+        INPUT:
+
+        - ``template`` -- string. A valid git branch name.
+
+        OUTPUT:
+
+        A remote branch name where you have write permissions. As
+        close as possible to ``template``.
+
+        EXAMPLES::
+
+            sage: app.suggest_remote_branch('public/foo/bar')        
+            'public/foo/bar'
+            sage: app.suggest_remote_branch('u/some_user/foo/bar')        
+            'u/trac_user/foo/bar'
+            sage: app.suggest_remote_branch('foo/bar')        
+            'u/trac_user/foo/bar'
+        """
+        if template.startswith('public/'):
+            return template
+        name = self.config.username
+        if template.startswith('u/' + name):
+            return template
+        if template.startswith('u/'):
+            parts = template.split('/', 2)
+            if len(parts) == 3:
+                return '/'.join(['u', name, parts[2]])
+        return '/'.join(['u', name, template])
+
+    def push(self, ticket_number):
+        try:
+            remote = self.trac.remote_branch(ticket_number)
+        except ValueError:  # no remote branch yet
+            remote = self.repo.current_branch()
+        remote = self.suggest_remote_branch(remote)
+        print('remote branch: '+remote)
+        self.repo.push(remote)
 
     def guess_ticket_number(self, ticket):
         """
@@ -110,30 +150,30 @@ class Application(object):
     def save_trac_password(self, password):
         self.config.password = password
         
-    def print_config(self):
+    def print_config(self, ssh_keys=True):
         """
         Print configuration information
 
         EXAMPLES::
 
-            sage: app.print_config()
+            sage: app.print_config(False)
             Trac xmlrpc URL:
-                http://trac.sagemath.org/xmlrpc (anonymous)
-                http://trac.sagemath.org/login/xmlrpc (authenticated)
+                https://trac.sagemath.org/xmlrpc (anonymous)
+                https://trac.sagemath.org/login/xmlrpc (authenticated)
             Username: trac_user
             Password: trac_pass
         """
         c = self.config
-        import urllib.parse
         print('Trac xmlrpc URL:')
-        url_anon = urllib.parse.urljoin(c.server_hostname, 
-                                        c.server_anonymous_xmlrpc)
-        print('    {0} (anonymous)'.format(url_anon))
-        url_auth = urllib.parse.urljoin(c.server_hostname, 
-                                        c.server_authenticated_xmlrpc)
-        print('    {0} (authenticated)'.format(url_auth))
+        print('    {0} (anonymous)'.format(self.trac.url_anonymous))
+        print('    {0} (authenticated)'.format(self.trac.url_authenticated))
+        print('    realm {0}'.format(c.server_realm))
         print('Username: {0}'.format(c.username))
         print('Password: {0}'.format(c.password))
+        if ssh_keys:
+            print('Retrieving SSH keys...')
+            for key in self.trac.get_ssh_fingerprints():
+                print('    {0}'.format(key))
 
     def print_ticket(self, ticket_number):
         """

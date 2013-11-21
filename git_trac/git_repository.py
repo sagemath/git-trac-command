@@ -129,3 +129,6 @@ class GitRepository(object):
     def pull(self, remote_branch):
         self.git.echo.fetch('trac', remote_branch)
         self.git.echo.merge('FETCH_HEAD')
+
+    def push(self, remote_branch):
+        self.git.echo.push('trac', 'HEAD:'+remote_branch)

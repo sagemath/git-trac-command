@@ -3,7 +3,6 @@ A read-only cached version of @property
 """
 
 ##############################################################################
-#  The "git trac ..." command extension for git
 #  Copyright (C) 2013  Volker Braun <vbraun.name@gmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify

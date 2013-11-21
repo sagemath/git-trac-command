@@ -1,9 +1,9 @@
 """
-Exception Classes for Trac
+A read-only cached version of @property
 """
 
 ##############################################################################
-#  The "git trac ..." command extension for git
+#  SageUI: A graphical user interface to Sage, Trac, and Git.
 #  Copyright (C) 2013  Volker Braun <vbraun.name@gmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -20,27 +20,18 @@ Exception Classes for Trac
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-class TracError(RuntimeError):
-    pass
-
-class TracConnectionError(TracError):
-    def __init__(self, msg=None):
-        if msg is None:
-            TracError.__init__(self, 'Connection to trac server failed.')
-        else:
-            TracError.__init__(self, msg)
-        
-
-class TracInternalError(TracError):
-    def __init__(self, fault):
-        self._fault = fault
-        self.faultCode = fault.faultCode
-
-    def __str__(self):
-        return str(self._fault)
 
 
-class TracAuthenticationError(TracError):
-    def __init__(self):
-        TracError.__init__(self, 'Authentication with trac server failed.')
+class cached_property(object):
 
+    def __init__(self, method, name=None):
+        self.method = method
+        self.name = name or method.__name__
+        self.__doc__ = method.__doc__
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        result = self.method(instance)
+        setattr(instance, self.name, result)
+        return result

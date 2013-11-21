@@ -24,31 +24,69 @@ EXAMPLES::
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
+import os
 
 from datetime import datetime
+from xmlrpc.client import ServerProxy
 
 from .trac_ticket import TracTicket
-from .digest_transport import DigestTransport
-
+from .trac_error import TracAuthenticationError
+from .digest_transport import DigestTransport, AuthenticatedDigestTransport
+from .cached_property import cached_property
 
 class TracServer(object):
 
-    def __init__(self, server, anonymous_location, authenticated_location):
-        self.server = server
-        self.anonymous_proxy = self._create_anonymous_server_proxy(
-            server, anonymous_location)
-        self.authenticated_proxy = None
+    def __init__(self, config):
+        self.config = config
         self._current_ticket_number = None
 
-    def __repr__(self):
-        return "Trac server at " + self.server
-
-    def _create_anonymous_server_proxy(self, url_server, url_location):
+    @cached_property
+    def url_anonymous(self):
         import urllib.parse
-        url = urllib.parse.urljoin(url_server, url_location)
+        return urllib.parse.urljoin(self.config.server_hostname, 
+                                    self.config.server_anonymous_xmlrpc)
+
+    @cached_property
+    def url_authenticated(self):
+        import urllib.parse
+        return urllib.parse.urljoin(self.config.server_hostname, 
+                                    self.config.server_authenticated_xmlrpc)
+
+    @cached_property 
+    def anonymous_proxy(self):
         transport = DigestTransport()
+        return ServerProxy(self.url_anonymous, transport=transport)
+
+    @cached_property 
+    def authenticated_proxy(self):
+        transport = AuthenticatedDigestTransport(
+            realm=self.config.server_realm, 
+            url=self.config.server_hostname, 
+            username=self.config.username, 
+            password=self.config.password)
         from xmlrpc.client import ServerProxy
-        return ServerProxy(url, transport=transport)
+        return ServerProxy(self.url_authenticated, transport=transport)
+
+    def get_ssh_keys(self):
+        return self.authenticated_proxy.sshkeys.getkeys()
+
+    def get_ssh_fingerprints(self):
+        import tempfile
+        import subprocess
+        fingerprints = []
+        try:
+            fd, tmp = tempfile.mkstemp()
+            os.close(fd)
+            for key in self.get_ssh_keys():
+                with open(tmp, 'w') as f:
+                    f.write(key)
+                out = subprocess.check_output(['ssh-keygen', '-lf', tmp])
+                yield out.decode('utf-8').strip()
+        finally:
+            os.remove(tmp)
+
+    def __repr__(self):
+        return "Trac server at " + self.config.server_hostname
 
     def load(self, ticket_number):
         ticket_number = int(ticket_number)

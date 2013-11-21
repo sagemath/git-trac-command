@@ -54,6 +54,10 @@ class Config(object):
         return 'http://trac.sagemath.org'
 
     @property
+    def server_realm(self):
+        return 'sage.math.washington.edu'
+
+    @property
     def server_anonymous_xmlrpc(self):
         return 'xmlrpc'
 
@@ -63,6 +67,10 @@ class Config(object):
 
     @property
     def username(self):
+        try:
+            return os.environ['TRAC_USERNAME']
+        except KeyError:
+            pass
         try:
             return self._load('trac.username')
         except GitError:
@@ -75,6 +83,10 @@ class Config(object):
 
     @property
     def password(self):
+        try:
+            return os.environ['TRAC_PASSWORD']
+        except KeyError:
+            pass
         try:
             return self._load('trac.password')
         except GitError:

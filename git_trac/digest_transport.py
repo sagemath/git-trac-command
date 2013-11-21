@@ -16,8 +16,14 @@ AUTHORS:
 #  the License, or (at your option) any later version.
 #*****************************************************************************
 
-from xmlrpc.client import SafeTransport, Fault
 import urllib.request
+import urllib.parse
+from xmlrpc.client import SafeTransport, Fault
+
+from .trac_error import \
+    TracInternalError, TracAuthenticationError, TracConnectionError
+from .cached_property import cached_property
+
 
 class DigestTransport(SafeTransport):
     """
@@ -28,7 +34,6 @@ class DigestTransport(SafeTransport):
         sage: from sage.dev.digest_transport import DigestTransport
         sage: DigestTransport()
         <sage.dev.digest_transport.DigestTransport object at ...>
-
     """
     def __init__(self):
         """
@@ -39,13 +44,10 @@ class DigestTransport(SafeTransport):
             sage: from sage.dev.digest_transport import DigestTransport
             sage: type(DigestTransport())
             <class 'sage.dev.digest_transport.DigestTransport'>
-
         """
-        SafeTransport.__init__(self)
+        super().__init__()
 
-        self._opener = None
-
-    @property
+    @cached_property
     def opener(self):
         """
         Create an opener object.
@@ -58,32 +60,9 @@ class DigestTransport(SafeTransport):
             sage: from sage.dev.digest_transport import DigestTransport
             sage: DigestTransport().opener
             <urllib2.OpenerDirector instance at 0x...>
-
         """
-        if self._opener is None:
-            self._opener = urllib.request.build_opener(
-                urllib.request.HTTPDigestAuthHandler())
-        return self._opener
-
-    def add_authentication(self, realm, url, username, password):
-        """
-        Set authentication credentials for the opener returned by
-        :meth:`opener`.
-
-        EXAMPLES::
-
-            sage: from sage.dev.digest_transport import DigestTransport
-            sage: dt = DigestTransport()
-            sage: dt.add_authentication("realm", "url", "username", "password")
-            sage: dt.opener
-
-
-        """
-        assert self._opener is None
-
         authhandler = urllib.request.HTTPDigestAuthHandler()
-        authhandler.add_password(realm,url,username,password)
-        self._opener = urllib.request.build_opener(authhandler)
+        return urllib.request.build_opener(authhandler)
 
     def single_request(self, host, handler, request_body, verbose):
         """
@@ -115,20 +94,48 @@ class DigestTransport(SafeTransport):
                'time': <DateTime '20071025T16:48:05' at ...>,
                'keywords': '',
                'resolution': 'fixed'}],)
-
         """
-        import urllib.parse
+        url =  urllib.parse.urlunparse(('http', host, handler, '', '', ''))
         try:
             req = urllib.request.Request(
-                urllib.parse.urlunparse(('http', host, handler, '', '', '')),
-                request_body, {'Content-Type': 'text/xml',
-                               'User-Agent': self.user_agent})
+                url, request_body, 
+                {'Content-Type': 'text/xml', 'User-Agent': self.user_agent})
             response = self.opener.open(req)
             self.verbose = verbose
             return self.parse_response(response)
         except Fault as e:
-            from .trac_error import TracInternalError
             raise TracInternalError(e)
         except IOError as e:
-            from .trac_error import TracConnectionError
-            raise TracConnectionError(e)
+            if hasattr(e, 'code') and e.code == 401:
+                raise TracAuthenticationError()
+            else:
+                raise TracConnectionError(e.reason)
+
+
+
+class AuthenticatedDigestTransport(DigestTransport):
+
+    def __init__(self, realm, url, username, password):
+        """
+        Set authentication credentials for the opener returned by
+        :meth:`opener`.
+
+        EXAMPLES::
+
+            sage: from sage.dev.digest_transport import DigestTransport
+            sage: dt = DigestTransport()
+            sage: dt.add_authentication("realm", "url", "username", "password")
+            sage: dt.opener
+        """
+        super().__init__()
+        self._realm = realm
+        self._url = url
+        self._username = username
+        self._password = password
+
+    @cached_property
+    def opener(self):
+        authhandler = urllib.request.HTTPDigestAuthHandler()
+        authhandler.add_password(
+            self._realm, self._url, self._username, self._password)
+        return urllib.request.build_opener(authhandler)
