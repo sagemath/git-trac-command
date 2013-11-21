@@ -91,7 +91,7 @@ class Config(object):
             return self._load('trac.password')
         except GitError:
             raise SystemExit('Use "git trac config --pass=<secret>"'
-                             ' to set your trac username')
+                             ' to set your trac password')
 
     @password.setter
     def password(self, value):
