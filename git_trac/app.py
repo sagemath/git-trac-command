@@ -146,9 +146,11 @@ class Application(object):
 
     def save_trac_username(self, username):
         self.config.username = username
+        print('Saved trac username.')
 
     def save_trac_password(self, password):
         self.config.password = password
+        print('Saved trac password.')
         
     def print_config(self, ssh_keys=True):
         """
@@ -158,8 +160,9 @@ class Application(object):
 
             sage: app.print_config(False)
             Trac xmlrpc URL:
-                https://trac.sagemath.org/xmlrpc (anonymous)
-                https://trac.sagemath.org/login/xmlrpc (authenticated)
+                http://trac.sagemath.org/xmlrpc (anonymous)
+                http://trac.sagemath.org/login/xmlrpc (authenticated)
+                realm sage.math.washington.edu
             Username: trac_user
             Password: trac_pass
         """
