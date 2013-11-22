@@ -112,7 +112,7 @@ def launch():
         app.pull(ticket_number)
     elif args.subcommand == 'push':
         ticket_number = app.guess_ticket_number(args.ticket)
-        print('Pushing to Trac #{0}'.format(ticket_number)) 
+        print('Pushing to Trac #{0}...'.format(ticket_number)) 
         app.push(ticket_number)
     elif args.subcommand == 'get':
         ticket_number = app.guess_ticket_number(args.ticket)

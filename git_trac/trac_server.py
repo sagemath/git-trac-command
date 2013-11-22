@@ -101,6 +101,23 @@ class TracServer(object):
                              + str(ticket_number))
         return branch
 
+    def set_remote_branch(self, ticket, new_branch):
+        """
+        Replace the trac "Branch:" field with ``new_branch``
+        
+        INPUT:
+
+        - ``ticket`` -- a :class:`TracTicket`. The output of
+          :meth:`load`, for example.
+
+        - ``new_branch`` -- string.
+        """
+        attributes = {'_ts': ticket._data['_ts'],
+                      'branch': new_branch}
+        comment = ''
+        self.authenticated_proxy.ticket.update(
+            ticket.number, comment, attributes, True)
+
     def search_branch(self, branch_name):
         """
         Return the trac ticket using the given (remote) branch

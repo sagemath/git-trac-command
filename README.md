@@ -90,6 +90,11 @@ DOT_GIT/config file):
     Username: Myself
     Password: s3kr1t
 
+If you do not want to store your trac username/password on disk you
+can temporarily override it with the environment variables
+``TRAC_USERNAME`` and ``TRAC_PASSWORD``. These take precedence over
+any other configuration.
+
 
 Sage-Trac Specifics
 -------------------

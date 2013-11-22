@@ -91,8 +91,13 @@ class Application(object):
         except ValueError:  # no remote branch yet
             remote = self.repo.current_branch()
         remote = self.suggest_remote_branch(remote)
-        print('remote branch: '+remote)
+        print('Guessed remote branch: '+remote)
         self.repo.push(remote)
+        ticket = self.trac.load(ticket_number)
+        must_set_branch = (ticket.branch != remote)
+        if must_set_branch:
+            print('Changing the trac "Branch:" field...')
+            self.trac.set_remote_branch(ticket, remote)
 
     def guess_ticket_number(self, ticket):
         """
