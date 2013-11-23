@@ -115,3 +115,11 @@ https://github.com/sagemath/sage_trac), namely:
       $ git trac ssh-keys
       $ git trac ssh-keys --add=~/.ssh/id_rsa.pub
       This is not implemented yet
+
+
+Release Management
+------------------
+
+The Sage release management scripts are in the `git-trac.releasemgr`
+subdirectory. They are probably only useful to the Sage release
+manager.

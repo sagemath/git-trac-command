@@ -85,6 +85,8 @@ def test_app():
 def run_doctests():
     testmod('git_trac.doctest_parser')    
     testmod('git_trac.pretty_ticket')    
+    testmod('git_trac.releasemgr.commit_message')    
+    return
     test_trac_model()
     test_git_model()
     test_app()

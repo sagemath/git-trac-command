@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 # Easiest way to use this is to create a symlink
-# /dir/in/search/path/git-trac -> git-trac
+# /dir/in/search/path/git-releasemgr -> git-releasemgr
 
 
 import os
 import sys
 
 try:
-    from git_trac import cmdline
+    from git_trac.releasemgr import cmdline
 except ImportError:
     sys.path.append('')
-    from git_trac import cmdline
+    from git_trac.releasemgr import cmdline
 
 if __name__ == '__main__':
     try:
