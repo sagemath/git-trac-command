@@ -28,12 +28,12 @@ EXAMPLES::
     sage: print(format_ticket(ticket))
     Trac #1234: Title
     <BLANKLINE>
+    description
+    <BLANKLINE>
     URL: http://trac.sagemath.org/1234
     Reported by: Reporter
     Ticket author(s): Author
     Reviewer(s): Reviewer
-    <BLANKLINE>
-    description
 """
 
 import re

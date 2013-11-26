@@ -31,6 +31,8 @@ from .git_repository import GitRepository
 from .trac_server import TracServer
 
 TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]+)[-_/]')
+TICKET_WITH_NUMBER_REGEX = re.compile('^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
+
 
 
 class Application(object):
@@ -52,6 +54,40 @@ class Application(object):
         print('remote branch: '+remote)
         self.repo.pull(remote)
 
+    def suggest_local_branch(self, ticket_number, remote_branch):
+        """
+        Return a local branch name 
+
+        EXAMPLES::
+
+            sage: app.suggest_local_branch(123, 'public/foo/bar')        
+            't/123/public/foo/bar'
+            sage: app.suggest_local_branch(123, 'u/some_user/foo/bar')        
+            't/123/foo/bar'
+            sage: app.suggest_local_branch(123, 'foo/bar')
+            't/123/foo/bar'
+        """
+        if remote_branch.startswith('u/'):
+            parts = remote_branch.split('/', 2)
+            if len(parts) == 3:
+                remote_branch = parts[2]
+        return 't/{0}/{1}'.format(ticket_number, remote_branch)
+
+    def checkout(self, ticket_number, branch_name=None):
+        print('Loading ticket #{0}...'.format(ticket_number))
+        ticket = self.trac.load(ticket_number)
+        if len(ticket.branch) == 0:
+            raise ValueError('no branch attached to the trac ticket')
+        if branch_name is None:
+            branch = self.suggest_local_branch(ticket_number, ticket.branch)
+        else:
+            branch = branch_name.strip()
+            if len(branch) == 0:
+                raise ValueError('no local branch specified')
+        print('Checking out Trac #{0} remote branch {1} -> local branch {2}...'
+              .format(ticket_number, ticket.branch, branch))
+        self.repo.checkout_new_branch(ticket.branch, branch)
+
     def suggest_remote_branch(self, template):
         """
         Return a remote branch name
@@ -66,14 +102,30 @@ class Application(object):
         close as possible to ``template``.
 
         EXAMPLES::
-
+ 
             sage: app.suggest_remote_branch('public/foo/bar')        
             'public/foo/bar'
             sage: app.suggest_remote_branch('u/some_user/foo/bar')        
             'u/trac_user/foo/bar'
             sage: app.suggest_remote_branch('foo/bar')        
             'u/trac_user/foo/bar'
+
+        Remove ``'ticket/<number>/'`` or ``'t/<number>/'`` if necessary::
+
+            sage: app.suggest_remote_branch('ticket/123')
+            'u/trac_user/ticket/123'
+            sage: app.suggest_remote_branch('ticket/123/public/foo/bar')        
+            'public/foo/bar'
+            sage: app.suggest_remote_branch('ticket/123/u/some_user/foo/bar')        
+            'u/trac_user/foo/bar'
+            sage: app.suggest_remote_branch('ticket/123/foo/bar')        
+            'u/trac_user/foo/bar'
+            sage: app.suggest_remote_branch('t/123/foo/bar')        
+            'u/trac_user/foo/bar'
         """
+        m = TICKET_WITH_NUMBER_REGEX.match(template)
+        if m is not None:
+            template = m.group('name')
         if template.startswith('public/'):
             return template
         name = self.config.username

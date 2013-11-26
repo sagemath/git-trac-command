@@ -64,6 +64,9 @@ def launch():
     subparsers = parser.add_subparsers(dest='subcommand')
 
     parser_checkout = subparsers.add_parser('checkout', help='Download branch')
+    parser_checkout.add_argument('-b', '--branch', dest='branch_name', 
+                                 help='Local branch name', 
+                                 default=None)
     parser_checkout.add_argument('ticket', type=int, help='Ticket number')
 
     parser_search = subparsers.add_parser('search', help='Search trac')
@@ -106,7 +109,7 @@ def launch():
     if args.debug:
         debug_shell(app)
     elif args.subcommand == 'checkout':
-        app.checkout(args.ticket)
+        app.checkout(args.ticket, args.branch_name)
     elif args.subcommand == 'pull':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.pull(ticket_number)

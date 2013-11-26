@@ -54,12 +54,35 @@ Usage
       ...
       Branch: u/user/description
       ==============================================================================
-  
+
+
+* Checkout 
+  a remote branch:
+
+      $ git trac checkout 12345
+
+  Will automatically pick a local branch name ``t/12345/description``
+  based on the remote branch name. If you want a particular local
+  branch name, you can specify it manually:
+
+      $ git trac checkout -b my_brach 12345
+
 
 * Pull (= fetch + merge) from the branch
   on a ticket:
 
       $ git trac pull 12345
+
+  You can omit the ticket number, in which case the script will try to
+  search for the ticket having the local branch name attached. If that
+  fails, an attempt is made to deduce the ticket number from the local
+  branch name.
+
+
+* Push (upload) to the branch
+  on a ticket, and set the trac "Branch:" field accordingly:
+
+      $ git trac push 12345
 
   You can omit the ticket number, in which case the script will try to
   search for the ticket having the local branch name attached. If that

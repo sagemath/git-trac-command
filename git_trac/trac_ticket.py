@@ -195,7 +195,7 @@ class TracTicket_class(object):
 
     @property
     def branch(self):
-        return self._data.get('branch', '')
+        return self._data.get('branch', '').strip()
 
     @property
     def dependencies(self):

@@ -81,7 +81,7 @@ class GitRepository(object):
         """
         return self.git.symbolic_ref('--short', 'HEAD').strip()
 
-    def checkout_branch(self, branch_name, ticket_number=None):
+    def checkout_new_branch(self, remote, local):
         """
         Check out branch.
 
@@ -91,16 +91,18 @@ class GitRepository(object):
 
             sage: git.silent.stash()
             sage: branch = repo.current_branch()
-            sage: repo.checkout_branch('u/user/description')
-            sage: '* u/user/description' in git.branch()
+            sage: repo.checkout_new_branch('u/user/description', 'my/u/user/description')
+            sage: '* my/u/user/description' in git.branch()
             True
-            sage: repo.checkout_branch(branch)            
         """
-        if self.git.exit_code.show_ref(branch_name) != 0:
-            logging.debug('downloading branch %s', branch_name)
-            self.git.fetch('trac', branch_name)
-            self.git.branch(branch_name, 'FETCH_HEAD')
-        self.git.checkout(branch_name)
+        remote_ref = 'remotes/trac/' + remote
+        if self.git.exit_code.show_ref(remote_ref) != 0:
+            logging.debug('downloading branch %s', remote)
+            self.git.fetch('trac', remote)
+            self.git.branch(local, 'FETCH_HEAD')
+        else:
+            self.git.branch(local, remote_ref)            
+        self.git.checkout(local)
 
     def rename_branch(self, oldname, newname):
         r"""
