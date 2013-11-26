@@ -40,7 +40,7 @@ class ReleaseApplication(Application):
           be either local or remote (in that order of preference). If
           ``None``, the trac ``Branch:`` field is looked up.
         """
-        if ticket_number is None and Branch is None:
+        if ticket_number is None and branch is None:
             raise ValueError('either ticket or branch must be specified')
         if ticket_number is None:
             ticket_number = self.trac.search_branch(branch)
