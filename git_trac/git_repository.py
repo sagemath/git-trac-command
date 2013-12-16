@@ -104,6 +104,13 @@ class GitRepository(object):
             self.git.branch(local, remote_ref)            
         self.git.checkout(local)
 
+    def create(self, local, start_point='master'):
+        """
+        Create new branch.
+        """            
+        self.git.branch(local, start_point)            
+        self.git.checkout(local)
+
     def rename_branch(self, oldname, newname):
         r"""
         Rename ``oldname`` to ``newname``.

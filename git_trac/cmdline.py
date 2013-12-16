@@ -63,6 +63,12 @@ def launch():
                         help='one of [DEBUG, INFO, ERROR, WARNING, CRITICAL]')
     subparsers = parser.add_subparsers(dest='subcommand')
 
+    parser_create = subparsers.add_parser('create', help='Create new ticket')
+    parser_create.add_argument('-b', '--branch', dest='branch_name', 
+                               help='Branch name', 
+                               default=None)
+    parser_create.add_argument('summary', type=str, help='Ticket summary')
+
     parser_checkout = subparsers.add_parser('checkout', help='Download branch')
     parser_checkout.add_argument('-b', '--branch', dest='branch_name', 
                                  help='Local branch name', 
@@ -100,14 +106,13 @@ def launch():
         level = getattr(logging, args.log)
         logging.basicConfig(level=level)
 
-    if args.subcommand is None:
-        return parser.print_help()
-
     from .app import Application
     app = Application()
 
     if args.debug:
         debug_shell(app)
+    elif args.subcommand == 'create':
+        app.create(args.summary, args.branch_name)
     elif args.subcommand == 'checkout':
         app.checkout(args.ticket, args.branch_name)
     elif args.subcommand == 'pull':
@@ -132,4 +137,6 @@ def launch():
         if args.trac_pass is not None:
             app.save_trac_password(args.trac_pass)
         app.print_config()
-
+    else:
+        print('Unknown subcommand "{0}"'.format(args.subcommand))
+        parser.print_help()

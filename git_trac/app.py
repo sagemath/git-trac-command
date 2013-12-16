@@ -151,6 +151,18 @@ class Application(object):
             print('Changing the trac "Branch:" field...')
             self.trac.set_remote_branch(ticket, remote)
 
+    def create(self, summary, branch_name=None):
+        if branch_name is None:
+            branch_name = re.sub('[^a-zA-Z0-9]', '_', summary.lower().strip())
+        remote = self.suggest_remote_branch(branch_name)
+        print('Remote branch: {0}'.format(remote))
+        ticket_number = self.trac.create(summary, '')
+        print('Newly-created ticket number: {0}'.format(ticket_number))
+        print('Ticket URL: http://trac.sagemath.org/{0}'.format(ticket_number))
+        local = self.suggest_local_branch(ticket_number, remote)
+        print('Local branch: {0}'.format(local))
+        self.repo.create(local)
+
     def guess_ticket_number(self, ticket):
         """
         Guess the ticket number

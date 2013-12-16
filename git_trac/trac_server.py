@@ -118,6 +118,22 @@ class TracServer(object):
         self.authenticated_proxy.ticket.update(
             ticket.number, comment, attributes, True)
 
+    def create(self, summary, description):
+        """
+        Create a new trac ticket
+        
+        INPUT:
+        
+        - ``summary`` -- string. The summary (title) of the ticket
+        
+        - ``description`` -- string. The ticket description.
+
+        OUTPUT:
+
+        Integer. The newly-created trac ticket number.
+        """
+        return self.authenticated_proxy.ticket.create(summary, description)
+
     def search_branch(self, branch_name):
         """
         Return the trac ticket using the given (remote) branch
