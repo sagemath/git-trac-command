@@ -67,7 +67,7 @@ def launch():
     parser_print.add_argument('ticket', type=int, help='Ticket number')
 
     parser_merge = subparsers.add_parser('merge', help='Merge branch')
-    parser_merge.add_argument('--close', dest='close', action='store_false',
+    parser_merge.add_argument('--close', dest='close', action='store_true',
                                help='Close ticket', default=False)
     parser_merge.add_argument('ticket', type=int, help='Ticket number')
     args = parser.parse_args()
