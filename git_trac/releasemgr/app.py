@@ -27,7 +27,7 @@ class ReleaseApplication(Application):
         print(format_ticket(ticket))
 
 
-    def merge(self, ticket_number, branch):
+    def merge(self, ticket_number, close=False):
         """
         Create the "release" merge
 
@@ -36,22 +36,11 @@ class ReleaseApplication(Application):
         - ``ticket_number`` -- integer or None. The ticket. If
           ``None`` it will be guessed from the ``branch``.
 
-        - ``branch`` -- string or ``None``. The branch to merge. Can
-          be either local or remote (in that order of preference). If
-          ``None``, the trac ``Branch:`` field is looked up.
+        - ``close`` -- boolean. Whether to close the trac ticket.
         """
-        if ticket_number is None and branch is None:
-            raise ValueError('either ticket or branch must be specified')
-        if ticket_number is None:
-            ticket_number = self.trac.search_branch(branch)
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
-        if branch is None:
-            branch = ticket.branch
-        else:
-            if branch != ticket.branch:
-                raise ValueError('specified branch does not match ticket branch')
-        branch = branch.strip()
+        branch = ticket.branch.strip()
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
             
@@ -84,3 +73,17 @@ class ReleaseApplication(Application):
             self.git.echo.commit(file=tmp, author=RELEASE_MANAGER)
         finally:
             os.remove(tmp)
+
+        if close:
+            self.close_ticket(ticket)
+
+    def close_ticket(self, ticket):
+        comment = ''
+        attributes = {
+            '_ts': ticket.timestamp,
+            'status': 'closed',
+            'resolution': 'fixed',
+        }
+        notify = True
+        return self.trac.authenticated_proxy.ticket.update(
+            ticket.number, comment, attributes, notify)

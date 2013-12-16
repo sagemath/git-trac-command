@@ -168,6 +168,16 @@ class TracTicket_class(object):
         self._change_log = change_log
 
     @property
+    def timestamp(self):
+        """
+        Timestamp for XML-RPC calls
+        
+        The timestamp is an integer that must be set in subsequent
+        ticket.update() XMLRPC calls to trac.
+        """
+        return self._data['_ts']
+
+    @property
     def number(self):
         return self._number
 

@@ -66,11 +66,10 @@ def launch():
     parser_print = subparsers.add_parser('print', help='Print as commit message')
     parser_print.add_argument('ticket', type=int, help='Ticket number')
 
-    parser_merge = subparsers.add_parser('merge', help='Download branch')
-    parser_merge.add_argument('--ticket', dest='ticket', type=int,
-                               help='Ticket number', default=None)
-    parser_merge.add_argument('--branch', dest='branch', type=str,
-                               help='Branch name', default=None)
+    parser_merge = subparsers.add_parser('merge', help='Merge branch')
+    parser_merge.add_argument('--close', dest='close', action='store_false',
+                               help='Close ticket', default=False)
+    parser_merge.add_argument('ticket', type=int, help='Ticket number')
     args = parser.parse_args()
     print(args)
 
@@ -89,4 +88,4 @@ def launch():
     elif args.subcommand == 'print':
         app.print_ticket(args.ticket)
     elif args.subcommand == 'merge':
-        app.merge(args.ticket, args.branch)
+        app.merge(args.ticket, close=args.close)
