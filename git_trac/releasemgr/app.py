@@ -7,7 +7,8 @@ import tempfile
 
 from ..app import Application
 
-RELEASE_MANAGER = 'Release Manager <release@sagemath.org>'
+from ..people import RELEASE_MANAGER
+
 
 
 
@@ -27,7 +28,17 @@ class ReleaseApplication(Application):
         print(format_ticket(ticket))
 
 
-    def merge(self, ticket_number, close=False):
+    def _commit(self, commit_message, **kwds):
+        try:
+            fd, tmp = tempfile.mkstemp()
+            os.close(fd)
+            with open(tmp, 'w') as f:
+                f.write(commit_message)
+            self.git.echo.commit(file=tmp, author=RELEASE_MANAGER, **kwds)
+        finally:
+            os.remove(tmp)
+
+    def merge(self, ticket_number, close=False, allow_empty=False):
         """
         Create the "release" merge
 
@@ -37,6 +48,8 @@ class ReleaseApplication(Application):
           ``None`` it will be guessed from the ``branch``.
 
         - ``close`` -- boolean. Whether to close the trac ticket.
+
+        - ``allow_empty`` -- boolean. Whether to allow empty commits.
         """
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
@@ -59,20 +72,15 @@ class ReleaseApplication(Application):
 
         status = self.git.status()
         if 'nothing to commit' in status:
-            raise ValueError('already merged')
-            
-        if 'All conflicts fixed but you are still merging.' not in status:
-            self.git.merge('--abort')
-            raise ValueError('merge was not clean')
-
-        try:
-            fd, tmp = tempfile.mkstemp()
-            os.close(fd)
-            with open(tmp, 'w') as f:
-                f.write(commit_message)
-            self.git.echo.commit(file=tmp, author=RELEASE_MANAGER)
-        finally:
-            os.remove(tmp)
+            if not allow_empty:
+                raise ValueError('already merged')
+            print('This is an empty commit')
+            self._commit(commit_message, allow_empty=True)
+        else:
+            if 'All conflicts fixed but you are still merging.' not in status:
+                self.git.merge('--abort')
+                raise ValueError('merge was not clean')
+            self._commit(commit_message)
 
         if close:
             self.close_ticket(ticket)
@@ -87,3 +95,13 @@ class ReleaseApplication(Application):
         notify = True
         return self.trac.authenticated_proxy.ticket.update(
             ticket.number, comment, attributes, notify)
+
+    def close_tickets(self, head, exclude):
+        ticket_list = self.repo.release_merges(head, exclude)
+        for commit, ticket_number in ticket_list:
+            ticket = self.trac.load(ticket_number)
+            if ticket.status == 'closed':
+                print('Trac #{0} already closed'.format(ticket_number))
+            else:
+                print('Trac #{0}: {1} -> closed'.format(ticket_number, ticket.status))
+                self.close_ticket(ticket)

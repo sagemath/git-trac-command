@@ -24,12 +24,18 @@ operations.
 ##############################################################################
 
 
+import re        
 import logging
 
 from .cached_property import cached_property
 from .git_commit import GitCommit
 from .git_error import GitError, DetachedHeadException
 from .git_interface import GitInterface
+
+
+SPLIT_RELEASE_LOG_RE = re.compile(
+    '^(?P<sha1>[0-9a-f]{40}) Trac #(?P<ticket>[0-9]*): (?P<title>.*)')
+
 
 
 
@@ -141,3 +147,21 @@ class GitRepository(object):
 
     def push(self, remote_branch):
         self.git.echo.push('trac', 'HEAD:'+remote_branch)
+        
+    def release_merges(self, head, exclude):
+        from .people import RELEASE_MANAGER
+        log = self.git.log('--oneline', '--no-abbrev-commit', 
+                           head, '^'+exclude, author=RELEASE_MANAGER)
+        result = []
+        for line in log.splitlines():
+            match = SPLIT_RELEASE_LOG_RE.match(line.strip())
+            if match is None:
+                raise ValueError('parsing log failed at "{0}"'.format(line))
+            number = match.group('ticket')
+            try:
+                number = int(number)
+            except ValueError:
+                raise ValueError('failed to convert ticket number to integer: "{0}"'.format(line))
+            commit = GitCommit(self, match.group('sha1'))
+            result.append((commit, number))
+        return tuple(result)
