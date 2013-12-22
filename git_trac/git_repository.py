@@ -31,6 +31,7 @@ from .cached_property import cached_property
 from .git_commit import GitCommit
 from .git_error import GitError, DetachedHeadException
 from .git_interface import GitInterface
+from .people import RELEASE_MANAGER
 
 
 SPLIT_RELEASE_LOG_RE = re.compile(
@@ -149,7 +150,6 @@ class GitRepository(object):
         self.git.echo.push('trac', 'HEAD:'+remote_branch)
         
     def release_merges(self, head, exclude):
-        from .people import RELEASE_MANAGER
         log = self.git.log('--oneline', '--no-abbrev-commit', 
                            head, '^'+exclude, author=RELEASE_MANAGER)
         result = []
@@ -165,3 +165,40 @@ class GitRepository(object):
             commit = GitCommit(self, match.group('sha1'))
             result.append((commit, number))
         return tuple(result)
+
+    def find_release_merge_of_ticket(self, ticket_number):
+        """
+        Find the git commit that merged the given ticket
+
+        See also :meth:`find_ticket`.
+        """
+        from .people import RELEASE_MANAGER
+        log = self.git.log('--oneline', '--no-abbrev-commit', 
+                           'HEAD', author=RELEASE_MANAGER)
+        for line in log.splitlines():
+            match = SPLIT_RELEASE_LOG_RE.match(line.strip())
+            if match is None:
+                raise ValueError('parsing log failed at "{0}"'.format(line))
+            number = match.group('ticket')
+            try:
+                number = int(number)
+            except ValueError:
+                raise ValueError('failed to convert ticket number to integer: "{0}"'.format(line))
+            if number == ticket_number:
+                return GitCommit(self, match.group('sha1'))
+        raise ValueError('release manager has not merged Trac #{0}'.format(ticket_number))
+        
+    def find_release_merge_of_commit(self, commit):
+        """
+        Find the nearest release merge in the future of commit.
+
+        See also :meth:`find_release_merge_of_ticket.
+        """
+        merges = self.git.log('--reverse', '--format=oneline', '--ancestry-path',
+                              '--author='+RELEASE_MANAGER, 
+                             'HEAD', '^'+str(commit))
+        if merges == '':
+            raise ValueError('Commit {0} has not been released')
+        oldest = merges.splitlines()[0]
+        sha1 = oldest[0:40] 
+        return GitCommit(self, sha1, title=oldest[41:])

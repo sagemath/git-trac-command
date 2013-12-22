@@ -92,6 +92,14 @@ def launch():
     parser_get.add_argument('ticket', nargs='?', type=int, 
                                  help='Ticket number', default=None)
 
+    parser_find = subparsers.add_parser('find', help='Find trac ticket')
+    parser_find.add_argument('commit', type=str, help='Commit SHA1')
+
+    parser_log = subparsers.add_parser('log', help='Commit log for ticket')
+    parser_log.add_argument('ticket', type=int, help='Ticket number')
+    parser_log.add_argument('--oneline', dest='oneline', action='store_true',
+                            default=False, help='One line per commit')
+
     parser_config = subparsers.add_parser('config', help='Configure git-trac')
     parser_config.add_argument('--user', dest='trac_user', 
                                help='Trac username', default=None)
@@ -125,6 +133,10 @@ def launch():
     elif args.subcommand == 'get':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.print_ticket(ticket_number)
+    elif args.subcommand == 'log':
+        app.log(args.ticket, oneline=args.oneline)
+    elif args.subcommand == 'find':
+        app.find(args.commit)
     elif args.subcommand == 'search':
         try:
             app.search(branch=args.branch_name)

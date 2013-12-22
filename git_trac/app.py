@@ -328,3 +328,23 @@ class Application(object):
         ticket = self.trac.load(ticket_number)
         from .pretty_ticket import format_ticket
         print(format_ticket(ticket))
+
+    def log(self, ticket_number, oneline=False):
+        commit = self.repo.find_release_merge_of_ticket(ticket_number)
+        print('History of {0}'.format(commit.title))
+        # by convention, the first ancestor (sha1^) is the previous release merge
+        args = ['--color=always', commit.sha1, '^'+commit.sha1+'^']
+        if oneline:
+            args = ['--oneline'] + args
+        print(args)
+        self.git.echo.log(*args)
+
+    def find(self, commit):
+        try:
+            merge = self.repo.find_release_merge_of_commit(commit)
+            print('Commit has been merged by the release manager into your current branch.')
+        except ValueError:
+            print('Commit has not been merged by the release manager into your current branch.')
+            return
+        self.git.echo.show(merge.sha1, '--color=always')
+        

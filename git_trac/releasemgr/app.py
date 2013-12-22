@@ -60,6 +60,16 @@ class ReleaseApplication(Application):
         print('URL: http://trac.sagemath.org/{0}'.format(ticket.number))
         print('Trac #{0}: {1}'.format(ticket.number, ticket.title))
         print('Branch {0}'.format(branch))
+        print('Author(s): {0}'.format(ticket.author))
+        print('Reviewer(s): {0}'.format(ticket.reviewer))
+        
+        import string
+        if not all(author[0].strip() in string.ascii_uppercase 
+                   for author in ticket.author.split(',')):
+            raise ValueError('author {0} does not look right'.format(ticket.author))
+        if not all(reviewer[0].strip() in string.ascii_uppercase 
+                   for reviewer in ticket.reviewer.split(',')):
+            raise ValueError('reviewer {0} does not look right'.format(ticket.reviewer))
 
         from .commit_message import format_ticket
         commit_message = format_ticket(ticket)

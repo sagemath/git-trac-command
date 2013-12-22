@@ -90,6 +90,27 @@ Usage
   branch name.
 
 
+* Log of the commits for a
+  ticket:
+
+      $ git trac log 12345
+    
+
+* Find the trac ticket for a 
+  commit, either identified by its SHA1 or branch/tag name.
+
+      $ git log --oneline -1 ee5e39e
+      ee5e39e Allow default arguments in closures
+      $ git trac find ee5e39e
+      Commit has been merged by the release manager into your current branch.
+      commit 44efa774c5f991ea5f160646515cfe8d3f738479
+      Merge: 5fd5442 679310b
+      Author: Release Manager <release@sagemath.org>
+      Date:   Sat Dec 21 01:16:56 2013 +0000
+
+          Trac #15447: implement evaluation of PARI closures
+
+    
 Configuration
 -------------
 

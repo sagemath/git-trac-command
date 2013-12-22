@@ -104,4 +104,7 @@ class GitCommit(object):
         """
         return self.repository.git.log(self.sha1, format=format, max_count=1)
 
+    def get_parents(self):
+        parents = self.repository.git.show(format='%P')
+        return [GitCommit(self.repository, sha1) for sha1 in parents.split()]
         
