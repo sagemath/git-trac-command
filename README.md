@@ -65,7 +65,7 @@ Usage
   based on the remote branch name. If you want a particular local
   branch name, you can specify it manually:
 
-      $ git trac checkout -b my_brach 12345
+      $ git trac checkout -b my_branch 12345
 
 
 * Create a new ticket on trac, and a new local branch 
@@ -186,7 +186,7 @@ https://github.com/sagemath/sage_trac), namely:
       $ git trac search --branch=u/vbraun/toric_bundle
       15328
 
-* SSH public key management requries the ``sshkeys.py`` trac 
+* SSH public key management requires the ``sshkeys.py`` trac 
   plugin:
 
       $ git trac ssh-keys
