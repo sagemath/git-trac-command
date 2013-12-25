@@ -68,6 +68,18 @@ Usage
       $ git trac checkout -b my_brach 12345
 
 
+* Create a new ticket on trac, and a new local branch 
+  corresponding to it:
+
+      $ git trac create "This is the summary"
+
+  This will automatically create a local branch name
+  ``t/12345/this_is_the_summary``. You can specify it manually if you
+  prefer with:
+  
+      $ git trac create -b my_branch "This is the summary"
+
+
 * Pull (= fetch + merge) from the branch
   on a ticket:
 
@@ -109,6 +121,27 @@ Usage
       Date:   Sat Dec 21 01:16:56 2013 +0000
 
           Trac #15447: implement evaluation of PARI closures
+
+
+Too Long, Didn't Read
+---------------------
+
+To fix a bug, start with
+
+    $ git trac create "Fix foo"
+    
+This will open the ticket and create a new local branch
+``t/<number>/fix_foo``. Then edit Sage, followed by 
+
+    $ git add <filename>
+    $ git commit
+
+Repeat edit/commit as necessary. When you are finished, run
+
+    $ git trac push
+
+It will take the ticket number out of the branch name, so you don't
+have to specify it.
 
     
 Configuration
