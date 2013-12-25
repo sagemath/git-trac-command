@@ -27,11 +27,22 @@ EXAMPLES::
 import os
 
 from datetime import datetime
-from xmlrpc.client import ServerProxy
+
+try:
+    # Python 3.3+
+    from xmlrpc.client import ServerProxy
+    from .digest_transport import DigestTransport, AuthenticatedDigestTransport
+    from urllib import parse as url_parse
+except ImportError:
+    # Python 2.7
+    from xmlrpclib import ServerProxy
+    from .digest_transport_py2 import DigestTransport, AuthenticatedDigestTransport
+    from urllib2 import urlparse as url_parse
+
+    
 
 from .trac_ticket import TracTicket
 from .trac_error import TracAuthenticationError
-from .digest_transport import DigestTransport, AuthenticatedDigestTransport
 from .cached_property import cached_property
 
 class TracServer(object):
@@ -42,15 +53,13 @@ class TracServer(object):
 
     @cached_property
     def url_anonymous(self):
-        import urllib.parse
-        return urllib.parse.urljoin(self.config.server_hostname, 
-                                    self.config.server_anonymous_xmlrpc)
+        return url_parse.urljoin(self.config.server_hostname, 
+                                 self.config.server_anonymous_xmlrpc)
 
     @cached_property
     def url_authenticated(self):
-        import urllib.parse
-        return urllib.parse.urljoin(self.config.server_hostname, 
-                                    self.config.server_authenticated_xmlrpc)
+        return url_parse.urljoin(self.config.server_hostname, 
+                                 self.config.server_authenticated_xmlrpc)
 
     @cached_property 
     def anonymous_proxy(self):
@@ -64,7 +73,6 @@ class TracServer(object):
             url=self.config.server_hostname, 
             username=self.config.username, 
             password=self.config.password)
-        from xmlrpc.client import ServerProxy
         return ServerProxy(self.url_authenticated, transport=transport)
 
     def get_ssh_keys(self):
