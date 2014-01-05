@@ -86,7 +86,10 @@ class GitRepository(object):
             sage: repo.current_branch()
             'public/1002/anything'
         """
-        return self.git.symbolic_ref('--short', 'HEAD').strip()
+        # Does not work with git 1.7.9.5
+        # return self.git.symbolic_ref('--short', 'HEAD').strip()
+        branch = self.git.symbolic_ref('HEAD').strip()
+        return branch.lstrip('refs/').lstrip('heads/')
 
     def checkout_new_branch(self, remote, local):
         """
