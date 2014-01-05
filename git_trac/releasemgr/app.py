@@ -125,4 +125,4 @@ class ReleaseApplication(Application):
         log_tag  = self.git.log('--oneline', '--no-abbrev-commit', '-1', tag)
         if log_head != log_tag:
             raise ValueError('branch head is not tagged')
-        self.git.push('--tags', 'trac/develop')
+        self.git.push('--tags', 'trac', 'develop')
