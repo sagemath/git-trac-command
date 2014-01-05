@@ -7,9 +7,6 @@ a raw wrapper around calls to git and retuns the output as strings.
 
 EXAMPLES::
 
-    sage: git._check_user_email()
-
-
     sage: git.execute('status', porcelain=True)
     DEBUG cmd: git status --porcelain
     DEBUG stdout:  M foo4.txt
@@ -253,8 +250,6 @@ class GitInterface(object):
         return {'exit_code':retcode, 'stdout':stdout, 'stderr':stderr, 'cmd':complete_cmd}
 
     def _run(self, cmd, args, kwds={}, popen_stdout=None, popen_stderr=None, exit_code_to_exception=True):
-        if cmd not in self._safe_commands:
-            self._check_user_email()
         result = self._run_unsafe(cmd, args, kwds,
                                   popen_stdout=popen_stdout,
                                   popen_stderr=popen_stderr)
@@ -328,21 +323,6 @@ class GitInterface(object):
         return result['stdout']
 
     __call__ = execute
-
-    def _check_user_email(self):
-        r"""
-        Make sure that a real name and an email are set for git. 
-
-        These will show up next to any commit that user creates.  
-        """
-        if self._user_email_set:
-            return
-        name = self._run_unsafe('config', ['user.name'], popen_stdout=open('/dev/null', 'wb'))
-        email = self._run_unsafe('config', ['user.email'], popen_stdout=open('/dev/null', 'wb'))
-        if (name['exit_code'] == 0) and (email['exit_code'] == 0):
-            self._user_email_set = True
-        else:
-            raise UserEmailException()
 
 
 

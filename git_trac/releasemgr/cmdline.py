@@ -80,6 +80,7 @@ def launch():
     parser_close.add_argument('--exclude', dest='exclude', default='trac/develop',
                                help='Exclude commit')
 
+    parser_publish = subparsers.add_parser('publish', help='Publish version')
 
     args = parser.parse_args()
     print(args)
@@ -103,3 +104,5 @@ def launch():
                   allow_empty=args.allow_empty)
     elif args.subcommand == 'close':
         app.close_tickets(args.head, args.exclude)
+    elif args.subcommand == 'publish':
+        app.publish()

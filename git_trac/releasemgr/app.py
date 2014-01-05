@@ -115,3 +115,14 @@ class ReleaseApplication(Application):
             else:
                 print('Trac #{0}: {1} -> closed'.format(ticket_number, ticket.status))
                 self.close_ticket(ticket)
+                
+    def publish(self):
+        tag = self.git.tag('-l', '--contains', 'HEAD').splitlines()
+        if len(tag) != 1:
+            raise ValueError('branch head is not contained in single tag')
+        tag = tag[0]
+        log_head = self.git.log('--oneline', '--no-abbrev-commit', '-1', 'HEAD')
+        log_tag  = self.git.log('--oneline', '--no-abbrev-commit', '-1', tag)
+        if log_head != log_tag:
+            raise ValueError('branch head is not tagged')
+        self.git.push('--tags', 'trac/develop')
