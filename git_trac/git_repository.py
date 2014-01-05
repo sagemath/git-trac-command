@@ -205,3 +205,20 @@ class GitRepository(object):
         oldest = merges.splitlines()[0]
         sha1 = oldest[0:40] 
         return GitCommit(self, sha1, title=oldest[41:])
+
+    def review_diff(self, remote):
+        """
+        Create a list of changes to review
+        """
+        current = self.current_branch()
+        try:
+            print('Fetching remote branch...')
+            self.git.fetch('trac', remote)
+            self.git.checkout('--detach', 'FETCH_HEAD')
+            print('Fetching most recent beta version...')
+            self.git.fetch('trac', 'develop')
+            self.git.merge('FETCH_HEAD')
+            return self.git.diff('--minimal', '--color=always', 
+                                 'FETCH_HEAD..HEAD')
+        finally:
+            self.git.checkout(current)

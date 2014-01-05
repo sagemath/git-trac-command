@@ -348,3 +348,7 @@ class Application(object):
             return
         self.git.echo.show(merge.sha1, '--color=always')
         
+    def review_diff(self, ticket_number):
+        remote = self.trac.remote_branch(ticket_number)
+        diff = self.repo.review_diff(remote)
+        print diff

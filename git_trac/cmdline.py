@@ -92,6 +92,10 @@ def launch():
     parser_get.add_argument('ticket', nargs='?', type=int, 
                                  help='Ticket number', default=None)
 
+    parser_review = subparsers.add_parser('review', help='Show code to review')
+    parser_review.add_argument('ticket', nargs='?', type=int, 
+                               help='Ticket number', default=None)
+
     parser_find = subparsers.add_parser('find', help='Find trac ticket')
     parser_find.add_argument('commit', type=str, help='Commit SHA1')
 
@@ -130,6 +134,9 @@ def launch():
         ticket_number = app.guess_ticket_number(args.ticket)
         print('Pushing to Trac #{0}...'.format(ticket_number)) 
         app.push(ticket_number)
+    elif args.subcommand == 'review':
+        ticket_number = app.guess_ticket_number(args.ticket)
+        app.review_diff(ticket_number)
     elif args.subcommand == 'get':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.print_ticket(ticket_number)
