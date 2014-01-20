@@ -95,6 +95,10 @@ class ReleaseApplication(Application):
         if close:
             self.close_ticket(ticket)
 
+    def merge_multiple(self, ticket_numbers, close=False, allow_empty=False):
+        for ticket_number in ticket_numbers:
+            self.merge(ticket_number, close=close, allow_empty=allow_empty)
+
     def close_ticket(self, ticket):
         comment = ''
         attributes = {

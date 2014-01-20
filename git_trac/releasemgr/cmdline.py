@@ -72,7 +72,7 @@ def launch():
     parser_merge.add_argument('--allow-empty', dest='allow_empty', 
                               action='store_true',
                               help='Allow empty commits', default=False)
-    parser_merge.add_argument('ticket', type=int, help='Ticket number')
+    parser_merge.add_argument('tickets', type=int, nargs='+', help='Ticket number(s)')
 
     parser_close = subparsers.add_parser('close', help='Close merged tickets')
     parser_close.add_argument('--head', dest='head', default='HEAD',
@@ -100,7 +100,7 @@ def launch():
     elif args.subcommand == 'print':
         app.print_ticket(args.ticket)
     elif args.subcommand == 'merge':
-        app.merge(args.ticket, close=args.close, 
+        app.merge_multiple(args.tickets, close=args.close, 
                   allow_empty=args.allow_empty)
     elif args.subcommand == 'close':
         app.close_tickets(args.head, args.exclude)
