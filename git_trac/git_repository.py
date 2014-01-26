@@ -149,8 +149,11 @@ class GitRepository(object):
         self.git.echo.fetch('trac', remote_branch)
         self.git.echo.merge('FETCH_HEAD')
 
-    def push(self, remote_branch):
-        self.git.echo.push('trac', 'HEAD:'+remote_branch)
+    def push(self, remote_branch, force=False):
+        if force:
+            self.git.echo.push('--force', 'trac', 'HEAD:'+remote_branch)
+        else:
+            self.git.echo.push('trac', 'HEAD:'+remote_branch)
         
     def release_merges(self, head, exclude):
         log = self.git.log('--oneline', '--no-abbrev-commit', 

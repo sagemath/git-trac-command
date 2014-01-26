@@ -85,6 +85,8 @@ def launch():
                              help='Ticket number', default=None)
 
     parser_push = subparsers.add_parser('push', help='Upload changes')
+    parser_push.add_argument('--force', dest='force', action='store_true',
+                            default=False, help='Force push')
     parser_push.add_argument('ticket', nargs='?', type=int, 
                              help='Ticket number', default=None)
 
@@ -133,7 +135,7 @@ def launch():
     elif args.subcommand == 'push':
         ticket_number = app.guess_ticket_number(args.ticket)
         print('Pushing to Trac #{0}...'.format(ticket_number)) 
-        app.push(ticket_number)
+        app.push(ticket_number, args.force)
     elif args.subcommand == 'review':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.review_diff(ticket_number)
