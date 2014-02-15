@@ -285,6 +285,10 @@ class TracTicket_class(object):
         return self._data.get('priority', '<no priority>')
 
     @property
+    def commit(self):
+        return self._data.get('commit', '')
+
+    @property
     def keywords(self):
         return self._data.get('keywords', '')
 

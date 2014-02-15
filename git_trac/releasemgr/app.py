@@ -107,6 +107,8 @@ class ReleaseApplication(Application):
             'resolution': 'fixed',
         }
         notify = True
+        if len(ticket.commit) > 0:
+            attributes['branch'] = ticket.commit
         return self.trac.authenticated_proxy.ticket.update(
             ticket.number, comment, attributes, notify)
 
