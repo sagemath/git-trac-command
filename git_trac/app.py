@@ -34,6 +34,12 @@ TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]+)[-_/]')
 TICKET_WITH_NUMBER_REGEX = re.compile('^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
 
 
+def title_to_branch_name(title):
+    """
+    Convert a human-readable summary/title into a valid branch name
+    """
+    return re.sub('[^a-zA-Z0-9]', '_', title.lower().strip())
+
 
 class Application(object):
 
@@ -77,7 +83,13 @@ class Application(object):
         print('Loading ticket #{0}...'.format(ticket_number))
         ticket = self.trac.load(ticket_number)
         if len(ticket.branch) == 0:
-            raise ValueError('no branch attached to the trac ticket')
+            # No branch attached to the trac ticket, creating new one
+            branch_name = title_to_branch_name(ticket.title)
+            remote = self.suggest_remote_branch(branch_name)
+            local = self.suggest_local_branch(ticket_number, remote)
+            print('Newly created local branch: {0}'.format(local))
+            self.repo.create(local)
+            return
         if branch_name is None:
             branch = self.suggest_local_branch(ticket_number, ticket.branch)
         else:
@@ -153,7 +165,7 @@ class Application(object):
 
     def create(self, summary, branch_name=None):
         if branch_name is None:
-            branch_name = re.sub('[^a-zA-Z0-9]', '_', summary.lower().strip())
+            branch_name = title_to_branch_name(summary)
         remote = self.suggest_remote_branch(branch_name)
         print('Remote branch: {0}'.format(remote))
         ticket_number = self.trac.create(summary, '')
@@ -362,8 +374,8 @@ class Application(object):
         - ``readonly`` -- boolean. Whether to use ssh or http
         transport.
         """
-        REPO_RO = 'git@trac.sagemath.org:sage.git'
-        REPO_RW = 'git://trac.sagemath.org/sage.git'
+        REPO_RW = 'git@trac.sagemath.org:sage.git'
+        REPO_RO = 'git://trac.sagemath.org/sage.git'
         repo = REPO_RO if readonly else REPO_RW
         remotes = self.git.remote().split()
         if 'trac' in remotes:
