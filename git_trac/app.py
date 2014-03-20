@@ -352,3 +352,23 @@ class Application(object):
         remote = self.trac.remote_branch(ticket_number)
         diff = self.repo.review_diff(remote)
         print(diff)
+
+    def add_remote(self, readonly):
+        """
+        Add the "trac" remote if necessary
+        
+        INPUT:
+
+        - ``readonly`` -- boolean. Whether to use ssh or http
+        transport.
+        """
+        REPO_RO = 'git@trac.sagemath.org:sage.git'
+        REPO_RW = 'git://trac.sagemath.org/sage.git'
+        repo = REPO_RO if readonly else REPO_RW
+        remotes = self.git.remote().split()
+        if 'trac' in remotes:
+            cmd = 'set-url'
+        else:
+            cmd = 'add'
+        self.git.remote(cmd, 'trac', repo)
+        
