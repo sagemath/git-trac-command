@@ -113,13 +113,18 @@ class GitRepository(object):
         else:
             self.git.branch(local, remote_ref)            
         self.git.checkout(local)
+        self.set_upstream(remote)
 
-    def create(self, local, start_point='master'):
+    def create(self, local, starting_branch='develop'):
         """
         Create new branch.
         """            
-        self.git.branch(local, start_point)            
+        self.git.fetch('trac', starting_branch)
+        self.git.branch(local, 'FETCH_HEAD')
         self.git.checkout(local)
+
+    def set_upstream(self, remote):
+        self.git.branch('--set-upstream-to', 'remotes/trac/{0}'.format(remote))
 
     def rename_branch(self, oldname, newname):
         r"""
@@ -154,7 +159,8 @@ class GitRepository(object):
             self.git.echo.push('--force', 'trac', 'HEAD:'+remote_branch)
         else:
             self.git.echo.push('trac', 'HEAD:'+remote_branch)
-        
+        self.set_upstream(remote_branch)
+
     def release_merges(self, head, exclude):
         log = self.git.log('--oneline', '--no-abbrev-commit', 
                            head, '^'+exclude, author=RELEASE_MANAGER)
