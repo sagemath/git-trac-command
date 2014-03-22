@@ -63,10 +63,12 @@ def launch():
                         help='one of [DEBUG, INFO, ERROR, WARNING, CRITICAL]')
     subparsers = parser.add_subparsers(dest='subcommand')
 
+    # git releasemgr print
     parser_print = subparsers.add_parser('print', help='Print as commit message')
     parser_print.add_argument('ticket', type=int, help='Ticket number')
 
-    parser_merge = subparsers.add_parser('merge', help='Merge branch')
+    # git releasemgr merge
+    parser_merge = subparsers.add_parser('merge', help='Merge branch from ticket')
     parser_merge.add_argument('--close', dest='close', action='store_true',
                                help='Close ticket', default=False)
     parser_merge.add_argument('--allow-empty', dest='allow_empty', 
@@ -74,12 +76,18 @@ def launch():
                               help='Allow empty commits', default=False)
     parser_merge.add_argument('tickets', type=int, nargs='+', help='Ticket number(s)')
 
+    # git releasemgr unmerge
+    parser_unmerge = subparsers.add_parser('unmerge', help='Unmerge branch from ticket')
+    parser_unmerge.add_argument('ticket', type=int, help='Ticket number')
+
+    # git releasemgr close
     parser_close = subparsers.add_parser('close', help='Close merged tickets')
     parser_close.add_argument('--head', dest='head', default='HEAD',
                                help='Head commit')
     parser_close.add_argument('--exclude', dest='exclude', default='trac/develop',
                                help='Exclude commit')
 
+    # git releasemgr publish
     parser_publish = subparsers.add_parser('publish', help='Publish version')
 
     args = parser.parse_args()
@@ -102,6 +110,8 @@ def launch():
     elif args.subcommand == 'merge':
         app.merge_multiple(args.tickets, close=args.close, 
                   allow_empty=args.allow_empty)
+    elif args.subcommand == 'unmerge':
+        app.unmerge(args.ticket)
     elif args.subcommand == 'close':
         app.close_tickets(args.head, args.exclude)
     elif args.subcommand == 'publish':

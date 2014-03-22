@@ -132,3 +132,19 @@ class ReleaseApplication(Application):
         if log_head != log_tag:
             raise ValueError('branch head is not tagged')
         self.git.push('--tags', 'trac', 'develop')
+
+    def unmerge(self, ticket_number):
+        """
+        Undo a "release" merge
+
+        INPUT:
+
+        - ``ticket_number`` -- integer. The ticket.
+        """
+        commit = self.repo.find_release_merge_of_ticket(ticket_number)
+        first_parent = commit.get_parents()[0]
+        print('Removing {0}'.format(commit.get_message('short')))
+        print('Parent release commit is {0}'.format(first_parent))
+        # git rebase --verbose --preserve-merges shatoremove --onto shaoffirstparent
+        self.git.rebase('--verbose', '--preserve-merges',
+                        commit.sha1, '--onto', first_parent.sha1)

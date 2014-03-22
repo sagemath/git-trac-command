@@ -162,7 +162,7 @@ class GitRepository(object):
         self.set_upstream(remote_branch)
 
     def release_merges(self, head, exclude):
-        log = self.git.log('--oneline', '--no-abbrev-commit', 
+        log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent', 
                            head, '^'+exclude, author=RELEASE_MANAGER)
         result = []
         for line in log.splitlines():
@@ -185,7 +185,7 @@ class GitRepository(object):
         See also :meth:`find_ticket`.
         """
         from .people import RELEASE_MANAGER
-        log = self.git.log('--oneline', '--no-abbrev-commit', 
+        log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent',
                            'HEAD', author=RELEASE_MANAGER)
         for line in log.splitlines():
             match = SPLIT_RELEASE_LOG_RE.match(line.strip())
