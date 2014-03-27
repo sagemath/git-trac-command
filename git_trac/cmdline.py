@@ -116,8 +116,6 @@ def launch():
 
     args = parser.parse_args()
 
-    print(args)
-
     if args.log is not None:
         level = getattr(logging, args.log)
         logging.basicConfig(level=level)
@@ -126,6 +124,7 @@ def launch():
     app = Application()
 
     if args.debug:
+        print(args)
         debug_shell(app)
     elif args.subcommand == 'create':
         app.create(args.summary, args.branch_name)

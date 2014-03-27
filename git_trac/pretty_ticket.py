@@ -49,7 +49,7 @@ SEPARATOR_TEMPLATE = '\n' + '-' * 78 + '\n'
 
 #123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
 
-DESCRIPTION_TEMPLATE = '=' * 78 + """
+DESCRIPTION_TEMPLATE = u'=' * 78 + u"""
 Trac #{ticket.number}: {ticket.title}
 
 {ticket.description}
@@ -63,48 +63,48 @@ Keywords: {ticket.keywords}
 Dependencies: {ticket.dependencies}
 """
 
-"""
+u"""
 Reported by: {ticket.reporter:    <25} Owner: {ticket.owner:          <25}
 """
 
 
 
-GENERIC_CHANGE_TEMPLATE = """
+GENERIC_CHANGE_TEMPLATE = u"""
 [{change.change_capitalized}] {change.change_action}
 """
 
 CHANGE_TEMPLATES = {
     'comment_set':
-"""
+u"""
 Comment #{change.number} by {change.author} at {change.ctime} UTC:
 {change.comment}
 """,
 
 
     'author_set': 
-"""
+u"""
 [Authors] set to {change.new}
 """,
     'author_del': 
-"""
+u"""
 [Authors] {change.old} deleted
 """,
     'author_mod':
-"""
+u"""
 [Authors] changed from {change.old} to {change.new}
 """,
 
 
     'reviewer_set': 
-"""
+u"""
 [Reviewers] set to {change.new}
 """,
     'reviewer_mod':
-"""
+u"""
 [Reviewers] changed from {change.old} to {change.new}
 """,
     'reviewer_del': 
-"""
+u"""
 [Reviewers] {change.old} deleted
 """,
 
@@ -114,52 +114,52 @@ Comment #{change.number} by {change.author} at {change.ctime} UTC:
     'description_del': "[Description] modified",
 
     'attachment_set':
-"""
+u"""
 [Attachment] "{change.new}" added
 """,
     'attachment_mod':
-"""
+u"""
 [Attachment] "{change.new}" updated
 """,
     'attachment_del':
-"""
+u"""
 [Attachment] "{change.old}" deleted
 """,
 
     'summary_set': 
-"""
+u"""
 [Summary] set to {change.new}
 """,
     'summary_mod': 
-"""
+u"""
 [Summary] changed to {change.new}
 """,
     'summary_del': 
-"""
+u"""
 [Summary] {change.old} deleted
 """,
 
     'upstream_set':
-"""
+u"""
 [Report Upstream] set to {change.new}
 """,
     'upstream_mod':
-"""
+u"""
 [Report Upstream] changed to {change.new}
 """,
     'upstream_del':
-"""
+u"""
 [Report Upstream] {change.old} deleted
 """,
 }
 
 
-COMMENT_TEMPLATE = """
+COMMENT_TEMPLATE = u"""
 Comment #{change.number} by {change.author} at {change.ctime} UTC:
 {change.comment}
 """
 
-FOOTER_TEMPLATE = """
+FOOTER_TEMPLATE = u"""
 URL: http://trac.sagemath.org/{ticket.number}
 """ + '=' * 78
 
