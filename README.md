@@ -11,14 +11,23 @@ interfaces with trac over XMLRPC.
 Installation
 ------------
 
-The easiest way to use the code from this repo is to clone it and
-run ``setup.py``:
+The easiest way to just try out the code in this repo is to source the
+``enable.sh`` script, which will prepend it to your PATH. This enables
+the git trac subcommand until you close that shell, so no permanent
+change is made:
+
+    $ git clone https://github.com/sagemath/git-trac-command.git
+    $ source git-trac-command/enable.sh
+    Prepending the git-trac command to your search PATH
+
+To permanently install the code from this repo, clone it and run
+``setup.py``:
 
     $ git clone https://github.com/sagemath/git-trac-command.git
     $ cd git-trac-command
     $ python setup.py install
 
-Alternatively you can symlink ``git-trac`` to somewhere in your path:
+Alternatively you can just symlink ``git-trac`` to anywhere in your path:
 
     $ git clone https://github.com/sagemath/git-trac-command.git
     $ cd git-trac-command
