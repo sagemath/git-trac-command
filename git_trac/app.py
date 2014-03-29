@@ -149,13 +149,16 @@ class Application(object):
                 return '/'.join(['u', name, parts[2]])
         return '/'.join(['u', name, template])
 
-    def push(self, ticket_number, force=False):
-        try:
-            remote = self.trac.remote_branch(ticket_number)
-        except ValueError:  # no remote branch yet
-            remote = self.repo.current_branch()
-        remote = self.suggest_remote_branch(remote)
-        print('Guessed remote branch: '+remote)
+    def push(self, ticket_number, remote=None, force=False):
+        if remote is not None:
+            print('Specified remote branch: '+remote)
+        else:
+            try:
+                remote = self.trac.remote_branch(ticket_number)
+            except ValueError:  # no remote branch yet
+                remote = self.repo.current_branch()
+            remote = self.suggest_remote_branch(remote)
+            print('Guessed remote branch: '+remote)
         self.repo.push(remote, force)
         ticket = self.trac.load(ticket_number)
         must_set_branch = (ticket.branch != remote)
