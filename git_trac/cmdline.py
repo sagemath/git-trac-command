@@ -24,7 +24,6 @@ Handle Command Line Options
 
 import sys
 import os
-import importlib
 import logging
 
 
@@ -38,6 +37,7 @@ def debug_shell(app):
     ip.shell.user_global_ns['git'] = app.git
     ip.shell.user_global_ns['trac'] = app.trac
     def ipy_import(module_name, identifier):
+        import importlib
         module = importlib.import_module(module_name)
         ip.shell.user_global_ns[identifier] = getattr(module, identifier) 
     ipy_import('git_trac.git_interface', 'GitInterface')
