@@ -124,7 +124,17 @@ class GitRepository(object):
         self.git.checkout(local)
 
     def set_upstream(self, remote):
-        self.git.branch('--set-upstream-to', 'remotes/trac/{0}'.format(remote))
+        # The following does not work if the refspec
+        # (http://git-scm.com/book/en/Git-Internals-The-Refspec) does
+        # not include the given remote branch. 
+        #
+        #    self.git.branch('--set-upstream-to', 'remotes/trac/{0}'.format(remote))
+        #
+        # Since we told people to setup trac with "-t master" the
+        # refspec is just master. Instead, set it up manually:
+        local = self.current_branch()
+        self.git.config('branch.{0}.remote'.format(local), 'trac')
+        self.git.config('branch.{0}.merge'.format(local), 'refs/heads/{0}'.format(remote))
 
     def rename_branch(self, oldname, newname):
         r"""
