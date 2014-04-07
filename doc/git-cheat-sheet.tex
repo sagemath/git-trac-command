@@ -1,0 +1,348 @@
+\documentclass[10pt,landscape,a4paper]{article}
+
+
+%*****************************************************************************
+% Copyright (C) 2014 Volker Braun <vbraun.name@gmail.com>
+% Creative Commons Attribution-Share Alike 3.0 License.
+%*****************************************************************************
+
+
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{inconsolata}
+\usepackage[T1]{fontenc}
+\usepackage{fancyvrb}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\pdfinfo{
+  /Title (git-cheat-sheet.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Volker Braun)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+% This sets page margins to .5 inch if using letter paper, and to 1cm
+% if using A4 paper. (This probably isn't strictly necessary.)
+% If using another size paper, use default 1cm margins.
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+    { \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+    {\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+        {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+        {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+    }
+
+% Turn off header and footer
+\pagestyle{empty}
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\Large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+%\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\newcommand{\note}[1]{\hfill\textrm{\textcolor{gray}{#1}}}
+\newcommand{\args}[1]{\textit{\textcolor{blue}{#1}}}
+\newcommand{\stdout}[1]{\textcolor{Sepia}{#1}}
+
+% \fvset{frame=none,framesep=1mm,fontfamily=courier,fontsize=\scriptsize,numbers=left,framerule=.3mm,numbersep=1mm,commandchars=\\\{\}}
+
+\fvset{gobble=2,framesep=1mm,commandchars=\\\{\},xleftmargin=2mm,xrightmargin=4mm}
+
+\begin{center}
+  \Huge\textbf{Sage, Git, \& Trac}
+\end{center}
+
+\section{Quickstart}
+
+\subsection{Configuration}
+
+You only need to do this once:
+\begin{Verbatim}
+  git config --global user.name "Your Name"
+  git config --global user.email you@yourdomain.example.com
+\end{Verbatim}
+This data ends up in commits, so do it now before you forget!
+
+
+\subsection{Get the Sage Source Code}
+
+\begin{Verbatim}
+  git clone git://github.com/sagemath/sage.git
+\end{Verbatim}
+
+
+\subsection{Branch Often}
+
+A new branch is like an independent copy of the source code. Always
+switch to a new branch \emph{before} editing anything:
+\begin{Verbatim}
+  git branch \args{new\_branch\_name}\note{create new branch}
+  git checkout \args{new\_branch\_name}\note{switch to new branch}
+\end{Verbatim}
+Without an argument, the list of branches is displayed:
+\begin{Verbatim}
+  git branch
+  \stdout{  master}
+  \stdout{* new_branch_name}\note{* marks the current branch}
+\end{Verbatim}
+When you are finished, delete unused branches:
+\begin{Verbatim}
+  git branch -d \args{branch\_to\_delete}
+\end{Verbatim}
+
+
+\subsection{Where Am I?}
+
+Each change recorded by git is called a ``commit''. Examine history:
+\begin{Verbatim}
+  git show\note{show the most recent commit}
+  git log\note{list in reverse chronological order}
+\end{Verbatim}
+
+
+\subsection{What Did I Do?}
+
+This is probably the most important command. Example output:
+\begin{Verbatim}
+  git status
+  \stdout{  On branch new_branch_name}\note{= current branch name}
+  \stdout{Changes not staged for commit:}
+  \stdout{  (use "git add <file>..." to update what will be committed)}
+  \stdout{  (use "git checkout -- <file>..." to discard changes in}
+  \stdout{   working directory)}
+  \stdout{}
+  \stdout{	modified:   modified_file.py}\note{= file you just edited}
+  \stdout{}
+  \stdout{Untracked files:}
+  \stdout{  (use "git add <file>..." to include in what will be}
+  \stdout{   committed)}
+  \stdout{}
+  \stdout{	new_file.py}\note{= file you just added}
+  \stdout{}
+  \stdout{no changes added to commit}
+  \stdout{(use "git add" and/or "git commit -a")}
+\end{Verbatim}
+
+
+\subsection{Prepare to Commit}
+
+When you are finished, tell git which changes you want to commit:
+\begin{Verbatim}
+  git add \args{filename}\note{add particular file}
+  git add .\note{add all modified \& new}
+\end{Verbatim}
+The status command then lists the staged changes:
+\begin{Verbatim}
+  git st
+  \stdout{On branch new_branch_name}
+  \stdout{Changes to be committed:}
+  \stdout{  (use "git reset HEAD <file>..." to unstage)}
+  \stdout{}
+  \stdout{	modified:   modified_file.txt}
+  \stdout{	new file:   new_file.txt}
+\end{Verbatim}
+
+
+\subsection{Commit}
+
+The commit command permanently records the staged changes. The new
+commit becomes the new branch head:
+\begin{Verbatim}
+  git commit\note{opens editor for commit message}
+  git commit -m "My Commit Message"
+\end{Verbatim}
+Commits cannot be changed, but they can be discarded and re-done with
+the \texttt{--amend} switch. \emph{Never} amend commits that you have
+already shared with somebody.
+
+\section{Summary}
+
+\textbf{workspace} is the file system: files that you can edit
+\begin{Verbatim}
+  git add \args{filename}\note{copy file to staging}
+  git reset HEAD \args{filename}\note{copy staged file back}
+\end{Verbatim}
+\textbf{staging} is a special area inside the git repository
+\begin{Verbatim}
+  git commit\note{commit all staged files}
+\end{Verbatim}
+\textbf{commits} are the permanently recorded history
+\begin{Verbatim}
+  git checkout -- \args{filename}\note{copy file from repo to workspace}
+\end{Verbatim}
+
+
+\section{Merging}
+
+A commit with more than one parent is a merge commit:
+\begin{Verbatim}
+  git merge \args{other\_branch}\note{incorporate other branch/commit}
+\end{Verbatim}
+If there is no conflict this automatically creates a new merge
+commit. Otherwise, the conflicting regions are marked like this:
+\begin{Verbatim}
+  \stdout{Here are lines that are either unchanged from the common}
+  \stdout{ancestor, or cleanly resolved because only one side changed.}
+  \stdout{<<<<<<< yours:source_file.py}
+  \stdout{Conflict resolution is hard;}
+  \stdout{let's go shopping.}
+  \stdout{=======}
+  \stdout{Git makes conflict resolution easy.}
+  \stdout{>>>>>>> theirs:source_file.py}
+  \stdout{And here is another line that is cleanly resolved or unmodified.}
+\end{Verbatim}
+Edit as needed; To finish, run one of:
+\begin{Verbatim}
+  git commit\note{commit your merge conflict resolution}
+  git merge --abort\note{discard merge attempt}
+\end{Verbatim}
+
+
+\section{Branch Heads}
+
+A git branch is just a pointer to a commit. This commit is called the
+branch \texttt{HEAD}. You can point it elsewhere with
+(\texttt{--hard}) or without (\texttt{--soft}, less common) resetting
+the actual files. That is, the following discards content of the
+current branch and makes it indistinguishable from a new branch that
+started at \verb!new_head_commit!:
+\begin{Verbatim}
+  git reset --hard \args{new_head_commit}
+\end{Verbatim}
+
+There are various ways to specify a commit to reset to:
+\begin{Verbatim}
+  3472a854df051b57d1cb7e4934913f17f1fef820\note{40-digit SHA1}
+  3472a85\note{the first few digits of the SHA1}
+  branch_name\note{the name of another branch pointing to it}
+  6.2.beta6\note{a tag in the Sage git repo; Every version is tagged}
+  origin/develop\note{the \texttt{develop} branch in the remote \texttt{origin}}
+  HEAD~\note{first parent of the current head}
+  HEAD~2\note{first parent of the first parent of the current head}
+  HEAD^2\note{second parent of the current head}
+  FETCH_HEAD\note{commit downloaded with the \texttt{git fetch} command}
+\end{Verbatim}
+
+
+\section{Trac and the Sage Git Repo}
+
+At \url{http://git.sagemath.org} you can browse our own git
+repository. On trac tickets, you can click on the links under
+\textbf{Branch:}
+
+\subsection{Git Trac Subcommand}
+
+We have added a \texttt{git trac} command to interact with our git and
+trac server. You can download and temporarily enable it via
+\begin{Verbatim}
+  git clone git@github.com:sagemath/git-trac-command.git
+  source git-trac-command/enable.sh
+\end{Verbatim}
+See the developer manual for how to install it on your system.
+
+\subsection{Configure Git Trac}
+
+To make changes to trac you need to have an account:
+\begin{Verbatim}
+  git trac config --user \textcolor{blue}{USER} --pass \textcolor{blue}{PASS}
+\end{Verbatim}
+Furthermore, our git repository uses your SSH keys for
+authentication. Log in on \url{http://trac.sagemath.org} and go to
+preferences $\to$ SSH keys. See the developer manual for more
+details. 
+
+\subsection{Downloading / Creating a Branch}
+
+\begin{Verbatim}
+  git trac checkout \args{ticket_number}\note{branch for existing ticket}
+  git trac create \args{"Ticket Title"}\note{create new ticket}
+\end{Verbatim}
+This will get the branch from trac, or create a new one if there is
+none yet attached to the ticket.
+
+\subsection{Pull Changes from Trac}
+
+\begin{Verbatim}
+  git trac pull \args{optional_ticket_number}
+\end{Verbatim}
+The trac ticket number will be guessed from a number embedded in the
+current branch name, or if there is a branch of the same name on a
+ticket already. 
+
+
+\subsection{Push your Changes to Trac}
+
+\begin{Verbatim}
+  git trac push \args{optional_ticket_number}
+\end{Verbatim}
+
+
+\section{Getting Help}
+
+\begin{Verbatim}
+  git help \args{command}\note{show help for (optional) command}
+  git trac create -h\note{help for subcommand}
+\end{Verbatim}
+Much more information can be found in the Sage developer guide.
+
+
+
+
+% % You can even have references
+% \rule{0.3\linewidth}{0.25pt}
+% \scriptsize
+% \bibliographystyle{abstract}
+% \bibliography{refFile}
+
+\end{multicols}
+\end{document}
+
+
+
+
+
