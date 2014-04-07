@@ -6,7 +6,9 @@ About
 
 This module implements a "git trac" subcommand of the git suite that
 interfaces with trac over XMLRPC.
- 
+
+Included is a one-page git cheat sheet for Sage/Git/Trac: 
+http://github.com/sagemath/git-trac-command/raw/master/doc/git-cheat-sheet.pdf
 
 Installation
 ------------
