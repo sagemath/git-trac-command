@@ -27,8 +27,16 @@ import os
 import logging
 
 
+def show_cheat_sheet():
+    import subprocess
+    root_dir = os.path.dirname(os.path.dirname(__file__))
+    cheat_sheet = os.path.join(root_dir, 'doc', 'git-cheat-sheet.pdf')
+    rc = subprocess.call(['xdg-open', cheat_sheet])
+    if rc != 0: 
+        print('Failed to run "xdg-open", please open git-cheat-sheet.pdf')
 
-def debug_shell(app):
+
+def debug_shell(app, parser):
     from IPython.frontend.terminal.ipapp import TerminalIPythonApp
     ip = TerminalIPythonApp.instance()
     ip.initialize(argv=[])
@@ -36,6 +44,7 @@ def debug_shell(app):
     ip.shell.user_global_ns['repo'] = app.repo
     ip.shell.user_global_ns['git'] = app.git
     ip.shell.user_global_ns['trac'] = app.trac
+    ip.shell.user_global_ns['parser'] = parser
     def ipy_import(module_name, identifier):
         import importlib
         module = importlib.import_module(module_name)
@@ -116,6 +125,10 @@ def launch():
     parser_config.add_argument('--pass', dest='trac_pass', 
                                help='Trac password', default=None)
 
+    parser_cheatsheet = subparsers.add_parser('cheat-sheet', help='Show the git trac cheat sheet')
+
+    parser_help = subparsers.add_parser('help', help='Show the git trac help')
+
     args = parser.parse_args()
 
     if args.log is not None:
@@ -127,7 +140,7 @@ def launch():
 
     if args.debug:
         print(args)
-        debug_shell(app)
+        debug_shell(app, parser)
     elif args.subcommand == 'create':
         app.create(args.summary, args.branch_name)
     elif args.subcommand == 'checkout':
@@ -162,6 +175,10 @@ def launch():
         if args.trac_pass is not None:
             app.save_trac_password(args.trac_pass)
         app.print_config()
+    elif args.subcommand == 'cheat-sheet':
+        show_cheat_sheet()
+    elif args.subcommand == 'help':
+        parser.print_help()
     else:
         print('Unknown subcommand "{0}"'.format(args.subcommand))
         parser.print_help()
