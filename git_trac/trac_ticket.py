@@ -114,14 +114,14 @@ class TicketChange_class(object):
     @property
     def change_action(self):
         if self.old == '':
-            return 'set to {change.new}'.format(change=self)
+            return u'set to {change.new}'.format(change=self)
         elif self.new == '':
-            return '{change.old} deleted'.format(change=self)
+            return u'{change.old} deleted'.format(change=self)
         else:
-            return 'changed from {change.old} to {change.new}'.format(change=self)
+            return u'changed from {change.old} to {change.new}'.format(change=self)
 
     def __repr__(self):
-        return self.get_author() + ' changed ' + self.get_change() + self.get_data()
+        return self.get_author() + u' changed ' + self.get_change() + self.get_data()
 
 
 class TicketComment_class(TicketChange_class):
