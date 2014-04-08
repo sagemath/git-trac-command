@@ -149,8 +149,13 @@ class TicketComment_class(TicketChange_class):
 
 
 def TracTicket(ticket_number, server_proxy):
+    from xml.parsers.expat import ExpatError
     ticket_number = int(ticket_number)
-    change_log = server_proxy.ticket.changeLog(ticket_number)
+    try:
+        change_log = server_proxy.ticket.changeLog(ticket_number)
+    except ExpatError:
+        print('Failed to parse the trac changelog, malformed XML!')
+        change_log = []
     data = server_proxy.ticket.get(ticket_number)
     ticket_changes = [TicketChange(entry) for entry in change_log]
     return TracTicket_class(data[0], data[1], data[2], data[3], ticket_changes)
