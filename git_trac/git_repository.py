@@ -165,10 +165,11 @@ class GitRepository(object):
         self.git.echo.merge('FETCH_HEAD')
 
     def push(self, remote_branch, force=False):
+        refspec = 'HEAD:refs/heads/'+remote_branch
         if force:
-            self.git.echo.push('--force', 'trac', 'HEAD:/refs/heads/'+remote_branch)
+            self.git.echo.push('--force', 'trac', refspec)
         else:
-            self.git.echo.push('trac', 'HEAD:/refs/heads/'+remote_branch)
+            self.git.echo.push('trac', refspec)
         self.set_upstream(remote_branch)
 
     def release_merges(self, head, exclude):
