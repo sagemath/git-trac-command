@@ -25,7 +25,8 @@ Handle Command Line Options
 import sys
 import os
 import importlib
-import logging
+
+from ..logger import logger
 
 
 
@@ -94,8 +95,9 @@ def launch():
     print(args)
 
     if args.log is not None:
+        import logging
         level = getattr(logging, args.log)
-        logging.basicConfig(level=level)
+        logger.setLevel(level=level)
 
     if args.subcommand is None:
         return parser.print_help()

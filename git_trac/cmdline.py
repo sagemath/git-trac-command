@@ -24,7 +24,8 @@ Handle Command Line Options
 
 import sys
 import os
-import logging
+
+from .logger import logger
 
 
 def show_cheat_sheet():
@@ -41,6 +42,7 @@ def debug_shell(app, parser):
     ip = TerminalIPythonApp.instance()
     ip.initialize(argv=[])
     ip.shell.user_global_ns['app'] = app
+    ip.shell.user_global_ns['logger'] = logger
     ip.shell.user_global_ns['repo'] = app.repo
     ip.shell.user_global_ns['git'] = app.git
     ip.shell.user_global_ns['trac'] = app.trac
@@ -132,8 +134,9 @@ def launch():
     args = parser.parse_args()
 
     if args.log is not None:
+        import logging
         level = getattr(logging, args.log)
-        logging.basicConfig(level=level)
+        logger.setLevel(level=level)
 
     from .app import Application
     app = Application()

@@ -25,14 +25,13 @@ operations.
 
 
 import re        
-import logging
 
 from .cached_property import cached_property
 from .git_commit import GitCommit
 from .git_error import GitError, DetachedHeadException
 from .git_interface import GitInterface
 from .people import RELEASE_MANAGER
-
+from .logger import logger
 
 SPLIT_RELEASE_LOG_RE = re.compile(
     '^(?P<sha1>[0-9a-f]{40}) Trac #(?P<ticket>[0-9]*): (?P<title>.*)')
@@ -107,7 +106,7 @@ class GitRepository(object):
         """
         remote_ref = 'remotes/trac/' + remote
         if self.git.exit_code.show_ref(remote_ref) != 0:
-            logging.debug('downloading branch %s', remote)
+            logger.debug('downloading branch %s', remote)
             self.git.fetch('trac', remote)
             self.git.branch(local, 'FETCH_HEAD')
         else:

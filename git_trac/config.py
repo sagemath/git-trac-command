@@ -24,7 +24,6 @@ Container for Configuration Data
 
 import os
 import sys
-import logging
 
 from .git_error import GitError
 

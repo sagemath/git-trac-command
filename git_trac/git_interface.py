@@ -51,7 +51,7 @@ import subprocess
 
 from .cached_property import cached_property
 from .git_error import GitError, DetachedHeadException, UserEmailException
-
+from .logger import logger
 
 
 
@@ -167,7 +167,7 @@ class GitInterface(object):
 
     def _log(self, prefix, log):
         for line in log.splitlines():
-            print('DEBUG '+prefix+': '+line)
+            logger.debug('%s = %s', prefix, line)
 
     def _run_unsafe(self, cmd, args, kwds={}, popen_stdout=None, popen_stderr=None):
         r"""
