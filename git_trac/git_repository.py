@@ -111,7 +111,7 @@ class GitRepository(object):
             self.git.fetch('trac', remote)
             self.git.branch(local, 'FETCH_HEAD')
         else:
-            self.git.branch(local, remote_ref)            
+            print('Local branch already exists. Use "git trac pull" to get updates.')
         self.git.checkout(local)
         self.set_upstream(remote)
 
