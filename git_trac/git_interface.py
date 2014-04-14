@@ -166,9 +166,8 @@ class GitInterface(object):
         return 'Interface to git repo'
 
     def _log(self, prefix, log):
-        if self._verbose:
-            for line in log.splitlines():
-                print('DEBUG '+prefix+': '+line)
+        for line in log.splitlines():
+            print('DEBUG '+prefix+': '+line)
 
     def _run_unsafe(self, cmd, args, kwds={}, popen_stdout=None, popen_stderr=None):
         r"""
