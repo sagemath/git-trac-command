@@ -24,18 +24,23 @@ Handle Command Line Options
 
 import sys
 import os
+import warnings
 
 from .logger import logger
 from .ticket_or_branch import TicketOrBranch
 
 
-def show_cheat_sheet():
+def xdg_open(uri):
     import subprocess
+    rc = subprocess.call(['xdg-open', uri])
+    if rc != 0: 
+        print('Failed to run "xdg-open", please open {0}'.format(uri))
+
+
+def show_cheat_sheet():
     root_dir = os.path.dirname(os.path.dirname(__file__))
     cheat_sheet = os.path.join(root_dir, 'doc', 'git-cheat-sheet.pdf')
-    rc = subprocess.call(['xdg-open', cheat_sheet])
-    if rc != 0: 
-        print('Failed to run "xdg-open", please open git-cheat-sheet.pdf')
+    xdg_open(cheat_sheet)
 
 
 def debug_shell(app, parser):
@@ -109,6 +114,14 @@ def launch():
     parser_get.add_argument('ticket', nargs='?', type=int, 
                                  help='Ticket number', default=None)
 
+    parser_print = subparsers.add_parser('print', help='Print trac page')
+    parser_print.add_argument('ticket', nargs='?', type=int, 
+                                 help='Ticket number', default=None)
+
+    parser_browse = subparsers.add_parser('browse', help='Open trac page in browser')
+    parser_browse.add_argument('ticket', nargs='?', type=int, 
+                               help='Ticket number', default=None)
+
     parser_review = subparsers.add_parser('review', help='Show code to review')
     parser_review.add_argument('ticket', nargs='?', type=int, 
                                help='Ticket number', default=None)
@@ -160,8 +173,15 @@ def launch():
         ticket_number = app.guess_ticket_number(args.ticket)
         app.review_diff(ticket_number)
     elif args.subcommand == 'get':
+        warnings.warn('deprecated; use "git trac print" instead')
         ticket_number = app.guess_ticket_number(args.ticket)
         app.print_ticket(ticket_number)
+    elif args.subcommand == 'print':
+        ticket_number = app.guess_ticket_number(args.ticket)
+        app.print_ticket(ticket_number)
+    elif args.subcommand == 'browse':
+        ticket_number = app.guess_ticket_number(args.ticket)
+        xdg_open('http://trac.sagemath.org/{0}'.format(ticket_number))
     elif args.subcommand == 'log':
         app.log(args.ticket, oneline=args.oneline)
     elif args.subcommand == 'find':
