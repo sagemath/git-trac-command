@@ -55,7 +55,19 @@ class Application(object):
         result = self.trac.search_branch(branch)
         print(result)
 
-    def pull(self, ticket_number):
+    def pull(self, ticket_or_branch=None):
+        try:
+            ticket_number = self.guess_ticket_number(ticket_or_branch)
+        except ValueError:
+            # Some more DWIM
+            if ticket_or_branch is not None:
+                # allow "git trac pull u/user/description" even if not on a ticket
+                # allow "git trac pull develop" which should never be on a ticket
+                self.repo.pull(str(ticket_or_branch))
+            else:
+                # Finally, just try "git pull"
+                self.git.pull()
+            return
         remote = self.trac.remote_branch(ticket_number)
         print('remote branch: '+remote)
         self.repo.pull(remote)
@@ -79,7 +91,14 @@ class Application(object):
                 remote_branch = parts[2]
         return 't/{0}/{1}'.format(ticket_number, remote_branch)
 
-    def checkout(self, ticket_number, branch_name=None):
+    def checkout(self, ticket_or_branch, branch_name=None):
+        if ticket_or_branch.is_number():
+            self._checkout_ticket(int(ticket_or_branch), branch_name)
+        else:
+            branch = str(ticket_or_branch)
+            self.repo.checkout_new_branch(branch, branch)
+            
+    def _checkout_ticket(self, ticket_number, branch_name=None):
         print('Loading ticket #{0}...'.format(ticket_number))
         ticket = self.trac.load(ticket_number)
         if len(ticket.branch) == 0:
