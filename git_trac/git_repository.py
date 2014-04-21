@@ -104,13 +104,13 @@ class GitRepository(object):
             sage: '* my/u/user/description' in git.branch()
             True
         """
-        remote_ref = 'remotes/trac/' + remote
-        if self.git.exit_code.show_ref(remote_ref) != 0:
-            logger.debug('downloading branch %s', remote)
-            self.git.fetch('trac', remote)
-            self.git.branch(local, 'FETCH_HEAD')
-        else:
+        if self.git.exit_code.checkout(local) == 0:
             print('Local branch already exists. Use "git trac pull" to get updates.')
+            return
+        remote_ref = 'remotes/trac/' + remote
+        logger.debug('downloading branch %s', remote)
+        self.git.fetch('trac', remote)
+        self.git.branch(local, 'FETCH_HEAD')
         self.git.checkout(local)
         self.set_upstream(remote)
 
