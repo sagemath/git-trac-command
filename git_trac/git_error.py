@@ -30,7 +30,7 @@ class GitError(RuntimeError):
         sage: raise GitError({'exit_code':128, 'stdout':'', 'stderr':'', 'cmd':'command'})
         Traceback (most recent call last):
         ...
-        git_trac.git_error.GitError: git returned with 
+        GitError: git returned with 
         non-zero exit code (128) when executing "command"
     """
     def __init__(self, result, explain=None, advice=None):
@@ -51,7 +51,7 @@ class GitError(RuntimeError):
         self.stderr = prefix(result['stderr'], '    STDERR')
         self.explain = explain
         self.advice = advice
-        template = 'git returned with non-zero exit code ({}) when executing "{}"'
+        template = 'git returned with non-zero exit code ({0}) when executing "{1}"'
         msg = template.format(self.exit_code, self.cmd)
         if len(self.stdout) != 0:
             msg += '\n' + self.stdout
@@ -71,7 +71,7 @@ class DetachedHeadException(RuntimeError):
         sage: raise DetachedHeadException()
         Traceback (most recent call last):
         ...
-        git_trac.git_error.DetachedHeadException: unexpectedly, 
+        DetachedHeadException: unexpectedly, 
         git is in a detached HEAD state
     """
     def __init__(self):
@@ -98,7 +98,7 @@ class InvalidStateError(RuntimeError):
         sage: raise InvalidStateError()
         Traceback (most recent call last):
         ...
-        git_trac.git_error.InvalidStateError: unexpectedly, 
+        InvalidStateError: unexpectedly, 
         git is in an unclean state
     """
     def __init__(self):
@@ -126,7 +126,7 @@ class UserEmailException(RuntimeError):
         sage: raise UserEmailException()
         Traceback (most recent call last):
         ...
-        git_trac.git_error.UserEmailException: user/email 
+        UserEmailException: user/email 
         is not configured, cannot make commits
     """
     def __init__(self):

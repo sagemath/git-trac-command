@@ -160,10 +160,11 @@ class TracServer(object):
 
             sage: trac.search_branch('u/ohanar/build_system')
             14480
-            sage: type(_)
-            <class 'int'>
+            sage: isinstance(_, int)
+            True
         """
         branch = self.anonymous_proxy.search.branch(branch_name)
         if len(branch) == 0:
             raise ValueError('no such branch on a trac ticket')
         return branch[0][0]
+    

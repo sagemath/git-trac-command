@@ -88,7 +88,7 @@ class GitRepository(object):
         # Does not work with git 1.7.9.5
         # return self.git.symbolic_ref('--short', 'HEAD').strip()
         branch = self.git.symbolic_ref('HEAD').strip()
-        return branch.lstrip('refs/').lstrip('heads/')
+        return str(branch.lstrip('refs/').lstrip('heads/'))
 
     def checkout_new_branch(self, remote, local):
         """
@@ -103,6 +103,7 @@ class GitRepository(object):
             sage: repo.checkout_new_branch('u/user/description', 'my/u/user/description')
             sage: '* my/u/user/description' in git.branch()
             True
+            sage: git.silent.checkout(branch)   # undo change
         """
         if self.git.exit_code.show_ref('refs/heads/' + local) == 0:
             print('Local branch already exists. Use "git trac pull" to get updates.')
@@ -153,10 +154,9 @@ class GitRepository(object):
             sage: repo.rename_branch('branchB', 'branchC')
             Traceback (most recent call last):
             ...
-            git_trac.git_error.GitError: git returned with 
-            non-zero exit code (128) when executing "git branch --move branchB branchC"
+            GitError: git returned with non-zero exit code (128) when executing "git branch --move branchB branchC"
                 STDERR: fatal: A branch named 'branchC' already exists.
-            sage: test.reset_repo()   # cleanup
+            sage: reset_repo()   # cleanup
         """
         self.git.branch(oldname, newname, move=True)
 

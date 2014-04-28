@@ -54,6 +54,9 @@ from .git_error import GitError, DetachedHeadException, UserEmailException
 from .logger import logger
 
 
+# Modified for doctesting
+DEBUG_PRINT = False
+
 
 class GitInterfaceSilentProxy(object):
     """
@@ -168,6 +171,8 @@ class GitInterface(object):
     def _log(self, prefix, log):
         for line in log.splitlines():
             logger.debug('%s = %s', prefix, line)
+            if DEBUG_PRINT:
+                print('DEBUG {0}: {1}'.format(prefix, line))
 
     def _run_unsafe(self, cmd, args, kwds={}, popen_stdout=None, popen_stderr=None):
         r"""
@@ -319,7 +324,7 @@ class GitInterface(object):
         result = self._run(cmd, args, kwds,
                            popen_stdout=subprocess.PIPE,
                            popen_stderr=subprocess.PIPE)
-        return result['stdout']
+        return str(result['stdout'])
 
     __call__ = execute
 

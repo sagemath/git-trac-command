@@ -18,6 +18,7 @@ AUTHORS:
 
 import urllib.request
 import urllib.parse
+
 from xmlrpc.client import SafeTransport, Fault
 
 from .trac_error import \

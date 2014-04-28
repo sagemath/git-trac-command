@@ -13,7 +13,7 @@ EXAMPLES::
     sage: t.number
     123
     sage: t.title
-    '+++ no summary +++'
+    '<no summary>'
     sage: t.ctime
     datetime.datetime(2013, 8, 10, 16, 36, 40)
     sage: t.mtime

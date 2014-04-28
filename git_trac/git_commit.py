@@ -20,7 +20,10 @@ Git Commit
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from functools import total_ordering
+try:
+    from functools import total_ordering
+except ImportError:
+    from py26_compat import total_ordering
 
 @total_ordering
 class GitCommit(object):
@@ -99,7 +102,7 @@ class GitCommit(object):
             Commit:     ...
             CommitDate: ...
             <BLANKLINE>
-                initial commit
+                sixth commit
             <BLANKLINE>
         """
         return self.repository.git.log(self.sha1, format=format, max_count=1)

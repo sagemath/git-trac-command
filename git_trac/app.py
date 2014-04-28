@@ -156,7 +156,7 @@ class Application(object):
         """
         m = TICKET_WITH_NUMBER_REGEX.match(template)
         if m is not None:
-            template = m.group('name')
+            template = str(m.group('name'))
         if template.startswith('public/'):
             return template
         name = self.config.username
@@ -165,8 +165,8 @@ class Application(object):
         if template.startswith('u/'):
             parts = template.split('/', 2)
             if len(parts) == 3:
-                return '/'.join(['u', name, parts[2]])
-        return '/'.join(['u', name, template])
+                return str('/'.join(['u', name, parts[2]]))
+        return str('/'.join(['u', name, template]))
 
     def push(self, ticket_number, remote=None, force=False):
         if remote is not None:
