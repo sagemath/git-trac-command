@@ -211,3 +211,11 @@ Release Management
 The Sage release management scripts are in the `git-trac.releasemgr`
 subdirectory. They are probably only useful to the Sage release
 manager.
+
+
+Testing and Python Compatibility
+--------------------------------
+
+* The git-trac command supports Python 2.6, 2.7, 3.3, and 3.4.
+* Most recent [Travis CI](https://travis-ci.org/sagemath/git-trac-command) test:
+  [![Build Status](https://travis-ci.org/sagemath/git-trac-command.svg?branch=master)](https://travis-ci.org/sagemath/git-trac-command)
