@@ -4,8 +4,8 @@ A Trac Ticket
 EXAMPLES::
 
     sage: from datetime import datetime
-    sage: create_time = datetime.fromtimestamp(1376149000)
-    sage: modify_time = datetime.fromtimestamp(1376150000)
+    sage: create_time = datetime.utcfromtimestamp(1376149000)
+    sage: modify_time = datetime.utcfromtimestamp(1376150000)
     sage: from git_trac.trac_ticket import TracTicket_class
     sage: t = TracTicket_class(123, create_time, modify_time, {})
     sage: t
@@ -15,9 +15,9 @@ EXAMPLES::
     sage: t.title
     '<no summary>'
     sage: t.ctime
-    datetime.datetime(2013, 8, 10, 16, 36, 40)
+    datetime.datetime(2013, 8, 10, 15, 36, 40)
     sage: t.mtime
-    datetime.datetime(2013, 8, 10, 16, 53, 20)
+    datetime.datetime(2013, 8, 10, 15, 53, 20)
 """
 
 ##############################################################################

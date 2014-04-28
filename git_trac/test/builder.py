@@ -26,8 +26,8 @@ Build Stuff for Doctests
 
 POPULATE_GIT_REPO = """
 git init .
-git config --local user.email "committer@example.com"
-git config --local user.name "Jane Developer"
+git config --local --add user.email "committer@example.com"
+git config --local --add user.name "Jane Developer"
 git config --local --add trac.username trac_user
 git config --local --add trac.password trac_pass
 
