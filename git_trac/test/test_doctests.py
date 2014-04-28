@@ -57,9 +57,10 @@ def sage_testmod(module, verbose=False, globs={}):
     for test in finder.find(module):
         test.globs.update(globs)
         rc = runner.run(test)
-        if rc is not None and not bool(rc):
+        if rc.failed:
             return False
     return True
+
 
 class RemainingDoctests(GitRepoBuilder, unittest.TestCase):
     
