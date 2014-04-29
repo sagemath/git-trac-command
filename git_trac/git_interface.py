@@ -324,7 +324,7 @@ class GitInterface(object):
         result = self._run(cmd, args, kwds,
                            popen_stdout=subprocess.PIPE,
                            popen_stderr=subprocess.PIPE)
-        return str(result['stdout'])
+        return result['stdout']
 
     __call__ = execute
 

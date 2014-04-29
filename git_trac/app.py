@@ -78,12 +78,12 @@ class Application(object):
 
         EXAMPLES::
 
-            sage: app.suggest_local_branch(123, 'public/foo/bar')        
-            't/123/public/foo/bar'
-            sage: app.suggest_local_branch(123, 'u/some_user/foo/bar')        
-            't/123/foo/bar'
-            sage: app.suggest_local_branch(123, 'foo/bar')
-            't/123/foo/bar'
+            sage: print(app.suggest_local_branch(123, 'public/foo/bar'))
+            t/123/public/foo/bar
+            sage: print(app.suggest_local_branch(123, 'u/some_user/foo/bar'))      
+            t/123/foo/bar
+            sage: print(app.suggest_local_branch(123, 'foo/bar'))
+            t/123/foo/bar
         """
         if remote_branch.startswith('u/'):
             parts = remote_branch.split('/', 2)
@@ -134,29 +134,29 @@ class Application(object):
 
         EXAMPLES::
  
-            sage: app.suggest_remote_branch('public/foo/bar')        
-            'public/foo/bar'
-            sage: app.suggest_remote_branch('u/some_user/foo/bar')        
-            'u/trac_user/foo/bar'
-            sage: app.suggest_remote_branch('foo/bar')        
-            'u/trac_user/foo/bar'
+            sage: print(app.suggest_remote_branch('public/foo/bar'))
+            public/foo/bar
+            sage: print(app.suggest_remote_branch('u/some_user/foo/bar'))      
+            u/trac_user/foo/bar
+            sage: print(app.suggest_remote_branch('foo/bar'))
+            u/trac_user/foo/bar
 
         Remove ``'ticket/<number>/'`` or ``'t/<number>/'`` if necessary::
 
-            sage: app.suggest_remote_branch('ticket/123')
-            'u/trac_user/ticket/123'
-            sage: app.suggest_remote_branch('ticket/123/public/foo/bar')        
-            'public/foo/bar'
-            sage: app.suggest_remote_branch('ticket/123/u/some_user/foo/bar')        
-            'u/trac_user/foo/bar'
-            sage: app.suggest_remote_branch('ticket/123/foo/bar')        
-            'u/trac_user/foo/bar'
-            sage: app.suggest_remote_branch('t/123/foo/bar')        
-            'u/trac_user/foo/bar'
+            sage: print(app.suggest_remote_branch('ticket/123'))
+            u/trac_user/ticket/123
+            sage: print(app.suggest_remote_branch('ticket/123/public/foo/bar'))
+            public/foo/bar
+            sage: print(app.suggest_remote_branch('ticket/123/u/some_user/foo/bar'))
+            u/trac_user/foo/bar
+            sage: print(app.suggest_remote_branch('ticket/123/foo/bar'))
+            u/trac_user/foo/bar
+            sage: print(app.suggest_remote_branch('t/123/foo/bar'))
+            u/trac_user/foo/bar
         """
         m = TICKET_WITH_NUMBER_REGEX.match(template)
         if m is not None:
-            template = str(m.group('name'))
+            template = m.group('name')
         if template.startswith('public/'):
             return template
         name = self.config.username
@@ -165,8 +165,8 @@ class Application(object):
         if template.startswith('u/'):
             parts = template.split('/', 2)
             if len(parts) == 3:
-                return str('/'.join(['u', name, parts[2]]))
-        return str('/'.join(['u', name, template]))
+                return '/'.join(['u', name, parts[2]])
+        return '/'.join(['u', name, template])
 
     def push(self, ticket_number, remote=None, force=False):
         if remote is not None:
@@ -212,8 +212,8 @@ class Application(object):
 
         EXAMPLES::
         
-            sage: app.repo.current_branch()
-            'public/1002/anything'
+            sage: print(app.repo.current_branch())
+            public/1002/anything
             sage: app.guess_ticket_number(None)
             1002
             sage: app.guess_ticket_number(12345)
@@ -374,10 +374,15 @@ class Application(object):
         self.git.echo.log(*args)
 
     def find(self, commit):
-        try:
-            merge = self.repo.find_release_merge_of_commit(commit)
-            print('Commit has been merged by the release manager into your current branch.')
-        except ValueError:
+        merge, release = self.repo.find_release_merge_of_commit(commit)
+        if release is not None:
+            version = re.sub('^Updated Sage version to ', '', release.title)
+            print('Commit has been merged in {0}.'.format(version))
+            assert merge is not None
+        elif merge is not None:
+            # only the release manager should ever see this
+            print('Commit has been merged, but not into a released version.')
+        else:
             print('Commit has not been merged by the release manager into your current branch.')
             return
         self.git.echo.show(merge.sha1, '--color=always')

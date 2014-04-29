@@ -65,8 +65,8 @@ class GitRepository(object):
 
         EXAMPLES::
 
-            sage: repo.untracked_files()
-            ['untracked_file']
+            sage: print(repo.untracked_files()[0])
+            untracked_file
         """
         log = self.git.ls_files(others=True, exclude_standard=True, z=True)
         result = []
@@ -82,13 +82,13 @@ class GitRepository(object):
 
         EXAMPLES::
 
-            sage: repo.current_branch()
-            'public/1002/anything'
+            sage: print(repo.current_branch())
+            public/1002/anything
         """
         # Does not work with git 1.7.9.5
         # return self.git.symbolic_ref('--short', 'HEAD').strip()
         branch = self.git.symbolic_ref('HEAD').strip()
-        return str(branch.lstrip('refs/').lstrip('heads/'))
+        return branch.lstrip('refs/').lstrip('heads/')
 
     def checkout_new_branch(self, remote, local):
         """
@@ -216,15 +216,37 @@ class GitRepository(object):
         Find the nearest release merge in the future of commit.
 
         See also :meth:`find_release_merge_of_ticket.
+        
+        INPUT:
+        
+        - ``commit`` -- string containing the sha1 hash of a commit
+
+        OUTPUT:
+
+        Pair ``(merge, release)`` of
+        :class:`git_trac.git_commit.GitCommit` instances. The first is
+        the commit where the release manager merged (indicates the
+        ticket number), the second is the oldest Sage release
+        containing it (indicated when it was merged).
+
+        Both can be ``None`` to indicate that the commit is not merged
+        / not merged in a stable release.
         """
-        merges = self.git.log('--reverse', '--format=oneline', '--ancestry-path',
-                              '--author='+RELEASE_MANAGER, 
+        merges = self.git.log('--reverse', '--format=%H%n%an <%ae>%n%s', '--ancestry-path', '-z',
+                              #'--author='+RELEASE_MANAGER, 
                              'HEAD', '^'+str(commit))
-        if merges == '':
-            raise ValueError('Commit {0} has not been released')
-        oldest = merges.splitlines()[0]
-        sha1 = oldest[0:40] 
-        return GitCommit(self, sha1, title=oldest[41:])
+        # iterate forward over the commits starting at the child of the given commit
+        merge_commit = None
+        release_commit = None
+        for merge in merges.split('\0'):
+            sha1, author, title = merge.splitlines()
+            if merge_commit is None and author == RELEASE_MANAGER:
+                merge_commit = GitCommit(self, sha1, title=title)
+                continue
+            if merge_commit is not None and not title.startswith('Trac #'):
+                release_commit = GitCommit(self, sha1, title=title)
+                break
+        return merge_commit, release_commit
 
     def review_diff(self, remote):
         """

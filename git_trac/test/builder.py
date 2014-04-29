@@ -27,7 +27,7 @@ Build Stuff for Doctests
 POPULATE_GIT_REPO = """
 git init .
 git config --local --add user.email "committer@example.com"
-git config --local --add user.name "Jane Developer"
+git config --local --add user.name "Jäne Developer (弄火)"
 git config --local --add trac.username trac_user
 git config --local --add trac.password trac_pass
 
@@ -49,14 +49,14 @@ git checkout -q master
 # a bunch of branches
 echo '123' > foo1.txt && git add . && git commit -m 'initial commit'
 git checkout -q -b 'my_branch'
-echo '234' > foo2.txt && git add . && git commit -m 'second commit'
+echo '234' > foo2.txt && git add . && git commit -m 'secønd commit'
 git checkout -q -b 'u/user/description'
 echo '345' > foo3.txt
 mv foo2.txt foo2_moved.txt 
 git add --all
 git commit -m 'third commit'
 git checkout -q -b 'u/user/1000/description'
-echo '456' > foo4.txt && git add . && git commit -m 'fourth commit'
+echo '456' > foo4.txt && git add . && git commit -m 'føurth commit'
 git checkout -q -b 'u/bob/1001/work'
 echo '567' > foo5.txt && git add . && git commit -m 'fifth commit'
 git checkout -q -b 'u/alice/1001/work'

@@ -47,7 +47,7 @@ class GitCommit(object):
 
     @property
     def title(self):
-        return str(self._title)
+        return self._title
 
     def __str__(self):
         return self._sha1
