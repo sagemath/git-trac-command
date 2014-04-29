@@ -239,7 +239,11 @@ class GitRepository(object):
         merge_commit = None
         release_commit = None
         for merge in merges.split('\0'):
-            sha1, author, title = merge.splitlines()
+            lines = merge.splitlines()
+            if len(lines) < 3:
+                break
+            else:
+                sha1, author, title = lines
             if merge_commit is None and author == RELEASE_MANAGER:
                 merge_commit = GitCommit(self, sha1, title=title)
                 continue
