@@ -84,11 +84,19 @@ class GitRepository(object):
 
             sage: print(repo.current_branch())
             public/1002/anything
+            sage: repo.git.silent.checkout('master')
+            sage: print(repo.current_branch())
+            master
+            sage: repo.git.silent.checkout('public/1002/anything')    # undo change
         """
         # Does not work with git 1.7.9.5
         # return self.git.symbolic_ref('--short', 'HEAD').strip()
         branch = self.git.symbolic_ref('HEAD').strip()
-        return branch.lstrip('refs/').lstrip('heads/')
+        def lremove(string, substr):
+            return string[len(substr):] if string.startswith(substr) else string
+        branch = lremove(branch, 'refs/')
+        branch = lremove(branch, 'heads/')
+        return branch
 
     def checkout_new_branch(self, remote, local):
         """
