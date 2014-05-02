@@ -135,8 +135,6 @@ def launch():
                             default=False, help='One line per commit')
 
     parser_config = subparsers.add_parser('config', help='Configure git-trac')
-    parser_config.add_argument('--readonly', dest='readonly', action='store_true',
-                               help='Read only remote (does not require SSH keys)', default=False)
     parser_config.add_argument('--user', dest='trac_user', 
                                help='Trac username', default=None)
     parser_config.add_argument('--pass', dest='trac_pass', 
@@ -193,7 +191,7 @@ def launch():
             parser_search.print_help()
             raise
     elif args.subcommand == 'config':
-        app.add_remote(args.readonly)
+        app.add_remote()
         if args.trac_user is not None:
             app.save_trac_username(args.trac_user)
         if args.trac_pass is not None:
