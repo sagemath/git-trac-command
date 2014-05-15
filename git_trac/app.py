@@ -30,7 +30,7 @@ from .config import Config
 from .git_repository import GitRepository
 from .trac_server import TracServer
 
-TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]+)[-_/]')
+TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]{2,})([-_/]|$)')
 TICKET_WITH_NUMBER_REGEX = re.compile('^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
 
 
@@ -220,11 +220,33 @@ class Application(object):
             12345
             sage: app.guess_ticket_number('u/user/1001/1_foo')
             1001
+            sage: app.guess_ticket_number('ticket/14102')
+            14102
+            sage: app.guess_ticket_number('ticket/22-vla-les-flics')
+            22
+
+        There is no open one digit ticket on trac. So 14102 is the correct answer::
+
+            sage: app.guess_ticket_number('ticket/blahv-2-foo-14102-blob')
+            14102
             sage: app.guess_ticket_number('u/user/description')
             Traceback (most recent call last):
             ...
-            ValueError: could not deduce ticket number from 
+            ValueError: could not deduce ticket number from
             branch name "u/user/description"
+            sage: app.guess_ticket_number('u/user/1-foo')
+            Traceback (most recent call last):
+            ...
+            ValueError: could not deduce ticket number from
+            branch name "u/user/1-foo"
+
+        The ticket number needs to be delimited by ``-`` or ``/``::
+
+            sage: app.guess_ticket_number('u/user/foo23')
+            Traceback (most recent call last):
+            ...
+            ValueError: could not deduce ticket number from
+            branch name "u/user/foo23"
         """
         try:
             return int(ticket)
