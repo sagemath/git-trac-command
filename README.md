@@ -39,10 +39,10 @@ Alternatively you can just symlink ``git-trac`` to anywhere in your path:
 Usage
 -----
 
-* Print the trac ticket information using ``git trac get
+* Print the trac ticket information using ``git trac print
   <ticket_number>``. 
 
-      $ git trac get 12345
+      $ git trac print 12345
       ==============================================================================
       Trac #12345: Title of ticket 12345
       ...
@@ -56,7 +56,7 @@ Usage
 
       $ git branch
       /u/user/description
-      $ git trac get
+      $ git trac print
       ==============================================================================
       Trac #nnnnn: Title
       <BLANKLINE>
