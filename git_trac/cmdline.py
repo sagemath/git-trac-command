@@ -25,6 +25,7 @@ Handle Command Line Options
 import sys
 import os
 import warnings
+import argparse
 
 from .logger import logger
 from .ticket_or_branch import TicketOrBranch
@@ -68,11 +69,36 @@ description = \
 The trac command extension for git
 """
 
+def monkey_patch():
+    """
+    Monkey patch ArgumentParser
+    """
+    old_parse_args = argparse.ArgumentParser.parse_args
+
+    def parse_args_override(self, args=None):
+        """
+        http://bugs.python.org/issue9253 prevents us from just redefining -h
+        Workaround by monkey-patching parse_args
+        """
+        if args is None:
+            args = list(sys.argv)[1:]
+        if len(args) > 0 and args[-1] == '-h':
+            args[-1] = 'help'
+        return old_parse_args(self, args)
+
+    setattr(argparse.ArgumentParser, 'parse_args', parse_args_override)
 
 
-def launch():
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=description)
+
+def make_parser():
+    monkey_patch()
+    parser = argparse.ArgumentParser(description=description, add_help=False)
+    # We cannot handle "git trac --help", this is outside of our control and purely within git
+    # redefine to not print '--help' in the online help
+    parser.add_argument('-h', dest='option_help', action='store_true',
+                        default=False, 
+                        help='show this help message and exit')
+
     parser.add_argument('--debug', dest='debug', action='store_true',
                         default=False, 
                         help='debug')
@@ -146,8 +172,13 @@ def launch():
 
     parser_help = subparsers.add_parser('help', help='Show the git trac help')
 
-    args = parser.parse_args()
+    return parser
 
+
+
+def launch():
+    parser = make_parser()
+    args = parser.parse_args(sys.argv[1:])
     if args.log is not None:
         import logging
         level = getattr(logging, args.log)
@@ -159,6 +190,8 @@ def launch():
     if args.debug:
         print(args)
         debug_shell(app, parser)
+    elif args.option_help:
+        parser.print_help()
     elif args.subcommand == 'create':
         app.create(args.summary, args.branch_name)
     elif args.subcommand == 'checkout':
