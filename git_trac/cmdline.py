@@ -155,6 +155,10 @@ def make_parser():
     parser_find = subparsers.add_parser('find', help='Find trac ticket')
     parser_find.add_argument('commit', type=str, help='Commit SHA1')
 
+    parser_try = subparsers.add_parser('try', help='Try out trac ticket in "detached HEAD"')
+    parser_try.add_argument('ticket_or_branch', type=TicketOrBranch, 
+                            help='Ticket number or remote branch name')
+
     parser_log = subparsers.add_parser('log', help='Commit log for ticket')
     parser_log.add_argument('ticket', type=int, help='Ticket number')
     parser_log.add_argument('--oneline', dest='oneline', action='store_true',
@@ -205,6 +209,8 @@ def launch():
     elif args.subcommand == 'review':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.review_diff(ticket_number)
+    elif args.subcommand == 'try':
+        app.tryout(args.ticket_or_branch)
     elif args.subcommand == 'get':
         warnings.warn('deprecated; use "git trac print" instead')
         ticket_number = app.guess_ticket_number(args.ticket)

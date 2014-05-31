@@ -119,6 +119,13 @@ class Application(object):
               .format(ticket_number, ticket.branch, branch))
         self.repo.checkout_new_branch(ticket.branch, branch)
 
+    def tryout(self, ticket_or_branch):
+        if ticket_or_branch.is_number():
+            branch = self.trac.remote_branch(ticket_or_branch)
+        else:
+            branch = str(ticket_or_branch)
+        self.repo.try_in_detached_head(branch)
+
     def suggest_remote_branch(self, template):
         """
         Return a remote branch name

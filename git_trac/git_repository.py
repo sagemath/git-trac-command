@@ -25,6 +25,7 @@ operations.
 
 
 import re        
+import textwrap
 
 from .cached_property import cached_property
 from .git_commit import GitCommit
@@ -276,3 +277,27 @@ class GitRepository(object):
                                  'FETCH_HEAD..HEAD')
         finally:
             self.git.checkout(current)
+
+    def try_in_detached_head(self, remote):
+        """
+        Try git branch in detached head with minimal recompiling
+        """
+        current = self.current_branch()
+        print('Fetching most recent beta version...')
+        self.git.fetch('trac', 'develop')
+        self.git.checkout('--detach', 'FETCH_HEAD')
+        print('Fetching remote branch {}...'.format(remote))
+        try:
+            self.git.fetch('trac', remote)
+            self.git.merge('FETCH_HEAD')
+        except GitError as e:
+            self.git.checkout(current)
+            raise e
+        msg = """
+        Merge of the most recent beta and the remote branch successful. When you are
+        finished, switch back to one of the existing branches. For example:
+
+            git checkout {0}
+        """.format(current)
+        print(textwrap.dedent(msg))
+
