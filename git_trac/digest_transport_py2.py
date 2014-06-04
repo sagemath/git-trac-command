@@ -17,8 +17,30 @@ AUTHORS:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
+import sys
 from xmlrpclib import SafeTransport, Fault
 import urllib2
+
+# Monkey patch http://bugs.python.org/issue8194
+if (sys.version_info.major == 2 and
+    sys.version_info.minor == 7 and
+    sys.version_info.micro <= 1):
+
+    import httplib
+    class patched_addinfourl(urllib2.addinfourl):
+
+        def getheader(self, name, default=None):
+            if self.headers is None:
+                raise httplib.ResponseNotReady()
+            return self.headers.getheader(name, default)
+
+        def getheaders(self):
+            if self.headers is None:
+                raise httplib.ResponseNotReady()
+            return self.headers.items()
+
+    urllib2.addinfourl = patched_addinfourl
+
 
 
 from .trac_error import \
