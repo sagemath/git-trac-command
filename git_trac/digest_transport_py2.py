@@ -22,9 +22,9 @@ from xmlrpclib import SafeTransport, Fault
 import urllib2
 
 # Monkey patch http://bugs.python.org/issue8194
-if (sys.version_info.major == 2 and
-    sys.version_info.minor == 7 and
-    sys.version_info.micro <= 1):
+if (sys.version_info[0] == 2 and
+    sys.version_info[1] == 7 and
+    sys.version_info[2] <= 1):
 
     import httplib
     class patched_addinfourl(urllib2.addinfourl):
