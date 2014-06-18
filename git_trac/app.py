@@ -421,7 +421,7 @@ class Application(object):
         diff = self.repo.review_diff(remote)
         print(diff)
 
-    def add_remote(self, readonly):
+    def add_remote(self):
         """
         Add the "trac" remote if necessary
         
@@ -432,11 +432,10 @@ class Application(object):
         """
         REPO_RW = 'git@trac.sagemath.org:sage.git'
         REPO_RO = 'git://trac.sagemath.org/sage.git'
-        repo = REPO_RO if readonly else REPO_RW
         remotes = self.git.remote().split()
         if 'trac' in remotes:
             cmd = 'set-url'
         else:
             cmd = 'add'
-        self.git.remote(cmd, 'trac', repo)
-        
+        self.git.remote(cmd, 'trac', REPO_RO)
+        self.git.remote('set-url', '--push', 'trac', REPO_RW)
