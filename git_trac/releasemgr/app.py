@@ -38,6 +38,24 @@ class ReleaseApplication(Application):
         finally:
             os.remove(tmp)
 
+    def _are_dependencies_merged(self, ticket):
+        """
+        Check that all dependencies are merged
+        """
+        if not ticket.dependencies.strip():    # no dependencies
+            return True
+        for dep in ticket.dependencies.split(','):
+            try:
+                dep_number = int(dep.lstrip(' #').rstrip())
+            except ValueError:
+                raise ValueError('invalid dependency: {0}'.format(dep))
+            try:
+                commit = self.repo.find_release_merge_of_ticket(dep_number)
+            except ValueError:
+                return False
+            # commit is merged, good
+        return True
+
     def merge(self, ticket_number, close=False, allow_empty=False):
         """
         Create the "release" merge
@@ -53,6 +71,10 @@ class ReleaseApplication(Application):
         """
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
+        if not self._are_dependencies_merged(ticket):
+            raise ValueError('ticket dependencies are not all merged: {0}'
+                             .format(ticket.dependencies))
+
         branch = ticket.branch.strip()
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
