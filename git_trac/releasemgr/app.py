@@ -3,6 +3,7 @@ The Release Management App
 """
 
 import os
+import re
 import tempfile
 
 from ..app import Application
@@ -56,6 +57,15 @@ class ReleaseApplication(Application):
             # commit is merged, good
         return True
 
+    MILESTONE_RE = re.compile('sage-[0-9]*\.[0-9]*')
+
+    def _is_valid_milestone(self, ticket):
+        """
+        Check that the milestone is valid (not pending/invalid)
+        """
+        match = self.MILESTONE_RE.search(ticket.milestone)
+        return (match is not None)
+
     def merge(self, ticket_number, close=False, allow_empty=False):
         """
         Create the "release" merge
@@ -74,7 +84,9 @@ class ReleaseApplication(Application):
         if not self._are_dependencies_merged(ticket):
             raise ValueError('ticket dependencies are not all merged: {0}'
                              .format(ticket.dependencies))
-
+        if not self._is_valid_milestone(ticket):
+            raise ValueError('ticket milestone is not intended to be merged: {0}'
+                             .format(ticket.milestone))
         branch = ticket.branch.strip()
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
