@@ -77,6 +77,9 @@ def launch():
                               help='Allow empty commits', default=False)
     parser_merge.add_argument('tickets', type=int, nargs='+', help='Ticket number(s)')
 
+    # git releasemgr merge-all
+    parser_merge_all = subparsers.add_parser('merge-all', help='Merge all tickets that are ready')
+
     # git releasemgr unmerge
     parser_unmerge = subparsers.add_parser('unmerge', help='Unmerge branch from ticket')
     parser_unmerge.add_argument('ticket', type=int, help='Ticket number')
@@ -87,6 +90,9 @@ def launch():
                                help='Head commit')
     parser_close.add_argument('--exclude', dest='exclude', default='trac/develop',
                                help='Exclude commit')
+
+    # git releasemgr todo
+    parser_todo = subparsers.add_parser('todo', help='Print list of tickets ready to merge')
 
     # git releasemgr publish
     parser_publish = subparsers.add_parser('publish', help='Publish version')
@@ -118,3 +124,7 @@ def launch():
         app.close_tickets(args.head, args.exclude)
     elif args.subcommand == 'publish':
         app.publish()
+    elif args.subcommand == 'todo':
+        app.todo()
+    elif args.subcommand == 'merge-all':
+        app.merge_all()
