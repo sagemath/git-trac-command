@@ -84,6 +84,8 @@ class Application(object):
             t/123/foo/bar
             sage: print(app.suggest_local_branch(123, 'foo/bar'))
             t/123/foo/bar
+            sage: print(app.suggest_local_branch(123, 'master'))
+            t/123/master
         """
         if remote_branch.startswith('u/'):
             parts = remote_branch.split('/', 2)
@@ -147,6 +149,10 @@ class Application(object):
             u/trac_user/foo/bar
             sage: print(app.suggest_remote_branch('foo/bar'))
             u/trac_user/foo/bar
+            sage: print(app.suggest_remote_branch('master'))
+            u/trac_user/master
+            sage: print(app.suggest_remote_branch('article-fsm-in-sage'))
+            u/trac_user/article-fsm-in-sage
 
         Remove ``'ticket/<number>/'`` or ``'t/<number>/'`` if necessary::
 
@@ -439,3 +445,35 @@ class Application(object):
             cmd = 'add'
         self.git.remote(cmd, 'trac', REPO_RO)
         self.git.remote('set-url', '--push', 'trac', REPO_RW)
+
+    def print_dependencies(self, ticket_number):
+        """
+        Print the trac dependencies
+
+        INPUT:
+
+        - ``ticket_number`` -- integer.
+
+        EXAMPLES:
+
+            sage: app.print_dependencies(16644)
+            Dependencies: #16660
+            * release manager has not merged Trac #16660
+        """
+        ticket = self.trac.load(ticket_number)
+        if not ticket.dependencies.strip():
+            print('No dependencies')
+            return
+        print('Dependencies: {0}'.format(ticket.dependencies))
+        for dep in ticket.dependencies.split(','):
+            try:
+                dep_number = int(dep.lstrip(' #').rstrip())
+            except ValueError:
+                print('* invalid dependency "{0}"'.format(dep))
+                continue
+            try:
+                commit = self.repo.find_release_merge_of_ticket(dep_number)
+            except ValueError as err:
+                print('* ' + str(err))
+                continue
+            print('* dependency {0} merged in {1}'.format(dep, commit))

@@ -140,6 +140,10 @@ def make_parser():
     parser_get.add_argument('ticket', nargs='?', type=int, 
                                  help='Ticket number', default=None)
 
+    parser_depends = subparsers.add_parser('depends', help='Print trac dependencies')
+    parser_depends.add_argument('ticket', nargs='?', type=int, 
+                                help='Ticket number', default=None)
+
     parser_print = subparsers.add_parser('print', help='Print trac page')
     parser_print.add_argument('ticket', nargs='?', type=int, 
                                  help='Ticket number', default=None)
@@ -152,7 +156,7 @@ def make_parser():
     parser_review.add_argument('ticket', nargs='?', type=int, 
                                help='Ticket number', default=None)
 
-    parser_find = subparsers.add_parser('find', help='Find trac ticket')
+    parser_find = subparsers.add_parser('find', help='Find trac ticket from SHA1')
     parser_find.add_argument('commit', type=str, help='Commit SHA1')
 
     parser_try = subparsers.add_parser('try', help='Try out trac ticket in "detached HEAD"')
@@ -216,6 +220,9 @@ def launch():
     elif args.subcommand == 'print':
         ticket_number = app.guess_ticket_number(args.ticket)
         app.print_ticket(ticket_number)
+    elif args.subcommand == 'depends':
+        ticket_number = app.guess_ticket_number(args.ticket)
+        app.print_dependencies(ticket_number)
     elif args.subcommand == 'browse':
         ticket_number = app.guess_ticket_number(args.ticket)
         xdg_open('http://trac.sagemath.org/{0}'.format(ticket_number))
