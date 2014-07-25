@@ -94,6 +94,10 @@ def launch():
     # git releasemgr todo
     parser_todo = subparsers.add_parser('todo', help='Print list of tickets ready to merge')
 
+    # git releasemgr upstream <url>
+    parser_upstream = subparsers.add_parser('upstream', help='Upload upstream tarball')
+    parser_upstream.add_argument('url', type=str, help='Tarball URL')
+
     # git releasemgr publish
     parser_publish = subparsers.add_parser('publish', help='Publish version')
 
@@ -128,3 +132,8 @@ def launch():
         app.todo()
     elif args.subcommand == 'merge-all':
         app.merge_all()
+    elif args.subcommand == 'upstream':
+        app.upstream(args.url)
+    else:
+        print('Unknown subcommand "{0}"'.format(args.subcommand))
+        parser.print_help()

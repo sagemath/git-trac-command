@@ -233,4 +233,10 @@ class ReleaseApplication(Application):
             print('  URL: http://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
             print('  Error: ' + error_message)
 
-    
+    def upstream(self, url):
+        """
+        Add tarball to http://sagemath.org/packages/upstream
+        """
+        import fabric.tasks
+        from .www_sagemath_org import upload_tarball
+        fabric.tasks.execute(upload_tarball, url)
