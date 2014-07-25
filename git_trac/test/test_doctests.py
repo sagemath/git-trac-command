@@ -125,9 +125,6 @@ class RemainingDoctests(GitRepoBuilder, unittest.TestCase):
     def find_modules(self):
         modules = self.add_dir(os.path.join(self.root_path, 'git_trac'))
         modules = set(modules).difference(self.already_handled + self.notest)
-        if not self.is_py3():
-            # the release management scripts require py3
-            modules = [mod for mod in modules if not mod.startswith('git_trac.releasemgr')]
         return modules
 
     def test_finder(self):
@@ -136,12 +133,11 @@ class RemainingDoctests(GitRepoBuilder, unittest.TestCase):
             'git_trac.trac_error',
             'git_trac.git_error',
             'git_trac.pretty_ticket',
+            'git_trac.releasemgr.commit_message',
         )
         not_found = set(required).difference(modules)
         self.assertTrue(not_found == set())
         self.assertFalse(any(name in modules for name in self.already_handled))
-        if self.is_py3():
-            self.assertTrue('git_trac.releasemgr.commit_message' in modules)
 
     def test_remaining_doctests(self):
         for module in self.find_modules():

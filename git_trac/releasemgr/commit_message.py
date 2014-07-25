@@ -1,16 +1,15 @@
-"""
+# -*- coding: utf-8 -*-
+u"""
 Pretty-Print Ticket as Git Commit Message
 
 EXAMPLES::
 
-
-
     sage: class Ticket(object):
     ....:     number = 1234
     ....:     title = 'Title'
-    ....:     description = 'description'
+    ....:     description = u'description äöü'
     ....:     reporter = 'Reporter'
-    ....:     author = 'Author'
+    ....:     author = u'Ingólfur Eðvarðsson'
     ....:     reviewer = 'Reviewer'
     ....:     branch = 'Branch'
     ....:     keywords = 'Keywords'
@@ -28,11 +27,11 @@ EXAMPLES::
     sage: print(format_ticket(ticket))
     Trac #1234: Title
     <BLANKLINE>
-    description
+    description äöü
     <BLANKLINE>
     URL: http://trac.sagemath.org/1234
     Reported by: Reporter
-    Ticket author(s): Author
+    Ticket author(s): Ingólfur Eðvarðsson
     Reviewer(s): Reviewer
 """
 
@@ -43,11 +42,11 @@ import textwrap
 
 #123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
 
-SUMMARY_TEMPLATE = """
+SUMMARY_TEMPLATE = u"""
 Trac #{ticket.number}: {ticket.title}
 """
 
-DESCRIPTION_TEMPLATE = """
+DESCRIPTION_TEMPLATE = u"""
 {ticket.description}
 
 URL: http://trac.sagemath.org/{ticket.number}

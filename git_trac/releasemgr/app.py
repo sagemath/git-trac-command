@@ -34,7 +34,7 @@ class ReleaseApplication(Application):
             fd, tmp = tempfile.mkstemp()
             os.close(fd)
             with open(tmp, 'w') as f:
-                f.write(commit_message)
+                f.write(commit_message.encode('utf-8'))
             self.git.echo.commit(file=tmp, author=RELEASE_MANAGER, **kwds)
         finally:
             os.remove(tmp)
