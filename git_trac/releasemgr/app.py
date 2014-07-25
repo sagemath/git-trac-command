@@ -199,14 +199,14 @@ class ReleaseApplication(Application):
         """
         tickets = self._get_ready_tickets()
         if not tickets:
-            print('No tickets are ready to be merged')
+            print(u'No tickets are ready to be merged')
             return
-        print('The following tickets are ready to be merged')
+        print(u'The following tickets are ready to be merged')
         for ticket_number in tickets:
             t = self.trac.load(ticket_number)
-            print('* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-        print('Merge tickets with:')
-        print('git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
+            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+        print(u'Merge tickets with:')
+        print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
     def merge_all(self, limit=10):
         """
@@ -239,4 +239,4 @@ class ReleaseApplication(Application):
         """
         import fabric.tasks
         from .www_sagemath_org import upload_tarball
-        fabric.tasks.execute(upload_tarball, url)
+        fabric.tasks.execute(upload_tarball, url.strip())
