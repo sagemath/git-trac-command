@@ -82,28 +82,28 @@ class ReleaseApplication(Application):
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
         if not self._are_dependencies_merged(ticket):
-            raise ValueError('ticket dependencies are not all merged: {0}'
+            raise ValueError(u'ticket dependencies are not all merged: {0}'
                              .format(ticket.dependencies))
         if not self._is_valid_milestone(ticket):
-            raise ValueError('ticket milestone is not intended to be merged: {0}'
+            raise ValueError(u'ticket milestone is not intended to be merged: {0}'
                              .format(ticket.milestone))
         branch = ticket.branch.strip()
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
             
-        print('URL: http://trac.sagemath.org/{0}'.format(ticket.number))
-        print('Trac #{0}: {1}'.format(ticket.number, ticket.title))
-        print('Branch {0}'.format(branch))
-        print('Author(s): {0}'.format(ticket.author))
-        print('Reviewer(s): {0}'.format(ticket.reviewer))
+        print(u'URL: http://trac.sagemath.org/{0}'.format(ticket.number))
+        print(u'Trac #{0}: {1}'.format(ticket.number, ticket.title))
+        print(u'Branch {0}'.format(branch))
+        print(u'Author(s): {0}'.format(ticket.author))
+        print(u'Reviewer(s): {0}'.format(ticket.reviewer))
         
         import string
         if not all(author[0].strip() in string.ascii_uppercase 
                    for author in ticket.author.split(',')):
-            raise ValueError('author {0} does not look right'.format(ticket.author))
+            raise ValueError(u'author {0} does not look right'.format(ticket.author))
         if not all(reviewer[0].strip() in string.ascii_uppercase 
                    for reviewer in ticket.reviewer.split(',')):
-            raise ValueError('reviewer {0} does not look right'.format(ticket.reviewer))
+            raise ValueError(u'reviewer {0} does not look right'.format(ticket.reviewer))
 
         from .commit_message import format_ticket
         commit_message = format_ticket(ticket)
