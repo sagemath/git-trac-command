@@ -239,4 +239,5 @@ class ReleaseApplication(Application):
         """
         import fabric.tasks
         from .www_sagemath_org import upload_tarball
-        fabric.tasks.execute(upload_tarball, url.strip())
+        url = url.strip(' \xe2\x80\x8b')
+        fabric.tasks.execute(upload_tarball, url)

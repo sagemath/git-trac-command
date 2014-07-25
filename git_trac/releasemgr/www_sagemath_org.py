@@ -31,4 +31,4 @@ def upload_tarball(url):
         run('./mirror_upstream.py /home/sagemath/upstream')
         run('./mirror-index.py')
         run('./fix_permissions.sh')
-        run('./go_live.sh')
+    run('/www-data/sagemath-org/go_live.sh')
