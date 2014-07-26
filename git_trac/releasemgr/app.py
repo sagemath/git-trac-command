@@ -177,8 +177,8 @@ class ReleaseApplication(Application):
         """
         commit = self.repo.find_release_merge_of_ticket(ticket_number)
         first_parent = commit.get_parents()[0]
-        print('Removing {0}'.format(commit.get_message('short')))
-        print('Parent release commit is {0}'.format(first_parent))
+        print(u'Removing {0}'.format(commit.get_message('short')))
+        print(u'Parent release commit is {0}'.format(first_parent))
         # git rebase --verbose --preserve-merges shatoremove --onto shaoffirstparent
         self.git.rebase('--verbose', '--preserve-merges',
                         commit.sha1, '--onto', first_parent.sha1)
@@ -228,10 +228,10 @@ class ReleaseApplication(Application):
             print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
         for ticket_number, error_message in errors:
             t = self.trac.load(ticket_number)
-            print('')
-            print('* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-            print('  URL: http://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
-            print('  Error: ' + error_message)
+            print(u'')
+            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+            print(u'  URL: http://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
+            print(u'  Error: ' + error_message)
 
     def upstream(self, url):
         """
