@@ -45,7 +45,7 @@ class ReleaseApplication(Application):
         """
         if not ticket.dependencies.strip():    # no dependencies
             return True
-        for dep in ticket.dependencies.split(','):
+        for dep in ticket.dependencies.replace(',', ' ').split():
             try:
                 dep_number = int(dep.lstrip(' #').rstrip())
             except ValueError:
