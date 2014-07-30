@@ -80,6 +80,10 @@ def launch():
     # git releasemgr merge-all
     parser_merge_all = subparsers.add_parser('merge-all', help='Merge all tickets that are ready')
 
+    # git releasemgr test
+    parser_test = subparsers.add_parser('test', help='Test merge unreview ticket')
+    parser_test.add_argument('ticket', type=int, help='Ticket number')
+
     # git releasemgr unmerge
     parser_unmerge = subparsers.add_parser('unmerge', help='Unmerge branch from ticket')
     parser_unmerge.add_argument('ticket', type=int, help='Ticket number')
@@ -121,7 +125,9 @@ def launch():
         app.print_ticket(args.ticket)
     elif args.subcommand == 'merge':
         app.merge_multiple(args.tickets, close=args.close, 
-                  allow_empty=args.allow_empty)
+                           allow_empty=args.allow_empty)
+    elif args.subcommand == 'test':
+        app.test_merge(args.ticket)
     elif args.subcommand == 'unmerge':
         app.unmerge(args.ticket)
     elif args.subcommand == 'close':

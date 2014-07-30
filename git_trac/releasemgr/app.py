@@ -129,6 +129,36 @@ class ReleaseApplication(Application):
         if close:
             self.close_ticket(ticket)
 
+    def test_merge(self, ticket_number):
+        """
+        Create the "test" merge
+
+        INPUT:
+
+        - ``ticket_number`` -- integer or None. The ticket. If
+          ``None`` it will be guessed from the ``branch``.
+        """
+        print('Loading ticket...')
+        ticket = self.trac.load(ticket_number)
+        branch = ticket.branch.strip()
+        if len(branch) == 0:
+            raise ValueError('no branch on ticket')
+
+        print('Fetching remote branch...')
+        self.git.echo.fetch('trac', branch)
+        print('Merging ticket...')
+        self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
+
+        commit_message = u'TEST Trac #{ticket.number}: {ticket.title}'.format(ticket=ticket)
+        status = self.git.status()
+        if 'nothing to commit' in status:
+            raise ValueError('already merged')
+        else:
+            if 'All conflicts fixed but you are still merging.' not in status:
+                self.git.merge('--abort')
+                raise ValueError('merge was not clean')
+            self._commit(commit_message)
+
     def merge_multiple(self, ticket_numbers, close=False, allow_empty=False):
         for ticket_number in ticket_numbers:
             self.merge(ticket_number, close=close, allow_empty=allow_empty)
