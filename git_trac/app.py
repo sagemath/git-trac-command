@@ -456,9 +456,10 @@ class Application(object):
 
         EXAMPLES:
 
-            sage: app.print_dependencies(16644)
-            Dependencies: #16660
-            * release manager has not merged Trac #16660
+            sage: app.print_dependencies(16461)
+            Dependencies: #16464, #16391
+            * release manager has not merged Trac #16464
+            * release manager has not merged Trac #16391
         """
         ticket = self.trac.load(ticket_number)
         if not ticket.dependencies.strip():
