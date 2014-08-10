@@ -301,3 +301,52 @@ class GitRepository(object):
         """.format(current)
         print(textwrap.dedent(msg))
 
+    def head_version(self):
+        """
+        Return the current version if the branch head is version-tagged.
+
+        OUTPUT:
+
+        String. The version tag. Raises a ``ValueError`` if the
+        current branch head is not tagged.
+        """
+        tag = self.git.tag('-l', '--points-at', 'HEAD').splitlines()
+        if len(tag) != 1:
+            raise ValueError('branch head is not contained in single tag')
+        return tag[0]
+
+    def _tag_iter(self, skip=0):
+        """
+        Iterate over the tags in reverse chronological order from the current head.
+        """
+        log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent', 'HEAD')
+        for line in log.splitlines():
+            if skip > 0:
+                skip -= 1
+                continue
+            sha1 = line[0:40]
+            tag = self.git.tag('-l', '--points-at', sha1).splitlines()
+            if len(tag) == 0:
+                continue
+            if len(tag) > 1:
+                raise ValueError('multiple tags for commit ' + sha1)
+            yield tag[0]
+        raise ValueError('did not find a tagged version')
+
+    def previous_stable_version(self):
+        """
+        Return the previous stable version.
+        """
+        for tag in self._tag_iter(skip=1):
+            if any(substr in tag for substr in ['beta', 'rc']):
+                continue
+            return tag
+        raise ValueError('did not find a stable version')
+
+    def current_version(self):
+        """
+        Return the current version.
+        """
+        for tag in self._tag_iter():
+            return tag
+        raise ValueError('did not find a stable version')

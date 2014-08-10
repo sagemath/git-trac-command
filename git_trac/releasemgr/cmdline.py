@@ -102,6 +102,12 @@ def launch():
     parser_upstream = subparsers.add_parser('upstream', help='Upload upstream tarball')
     parser_upstream.add_argument('url', type=str, help='Tarball URL')
 
+    # git releasemgr release <version>
+    parser_release = subparsers.add_parser('release', help='Create new release')
+    parser_release.add_argument('--nocheck', action='store_true', 
+                                default=False, help='Skip checks')
+    parser_release.add_argument('version', type=str, help='New version string')
+
     # git releasemgr publish
     parser_publish = subparsers.add_parser('publish', help='Publish version')
 
@@ -140,6 +146,8 @@ def launch():
         app.merge_all()
     elif args.subcommand == 'upstream':
         app.upstream(args.url)
+    elif args.subcommand == 'release':
+        app.release(args.version, check=not args.nocheck)
     else:
         print('Unknown subcommand "{0}"'.format(args.subcommand))
         parser.print_help()

@@ -126,7 +126,9 @@ class GitInterface(object):
     _safe_commands = (
         'config',    'diff',   'grep',       'log', 
         'ls_remote', 'remote', 'reset',      'show', 
-        'show_ref',  'status', 'symbolic_ref' )
+        'show_ref',  'status', 'symbolic_ref', 
+        'rev_parse', 
+    )
         
     _unsafe_commands = (
         'add',          'am',       'apply',       'bisect',

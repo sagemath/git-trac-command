@@ -28,7 +28,6 @@ class ReleaseApplication(Application):
         from .commit_message import format_ticket
         print(format_ticket(ticket))
 
-
     def _commit(self, commit_message, **kwds):
         try:
             fd, tmp = tempfile.mkstemp()
@@ -187,14 +186,7 @@ class ReleaseApplication(Application):
                 self.close_ticket(ticket)
                 
     def publish(self):
-        tag = self.git.tag('-l', '--contains', 'HEAD').splitlines()
-        if len(tag) != 1:
-            raise ValueError('branch head is not contained in single tag')
-        tag = tag[0]
-        log_head = self.git.log('--oneline', '--no-abbrev-commit', '-1', 'HEAD')
-        log_tag  = self.git.log('--oneline', '--no-abbrev-commit', '-1', tag)
-        if log_head != log_tag:
-            raise ValueError('branch head is not tagged')
+        tag = self.repo.head_version()
         self.git.push('--tags', 'trac', 'develop')
 
     def unmerge(self, ticket_number):
@@ -271,3 +263,14 @@ class ReleaseApplication(Application):
         from .www_sagemath_org import upload_tarball
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
+
+    def release(self, version, check=True):
+        from .make_release import update_version, create_tarball, check_tarball, check_upgrade
+        update_version(version)
+        assert version == self.repo.head_version()
+        create_tarball()
+        if check:
+            check_tarball('dist/sage-{0}.tar.gz'.format(version))
+            stable = self.repo.previous_stable_version()
+            check_upgrade(self.git, stable, version)
+        
