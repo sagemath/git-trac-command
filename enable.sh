@@ -29,7 +29,7 @@ then
     exit 1
 fi
 
-GIT_TRAC_DIR="$(pwd)/$(dirname -- $BASH_SOURCE)/bin"
+GIT_TRAC_DIR=`cd $(dirname -- $BASH_SOURCE)/bin && pwd -P`
 GIT_TRAC_CMD="$GIT_TRAC_DIR/git-trac"
 
 if [ "$(command -v git-trac)" == "$GIT_TRAC_CMD" ]
