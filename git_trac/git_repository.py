@@ -248,8 +248,9 @@ class GitRepository(object):
         merge_commit = None
         release_commit = None
         for merge in merges.split('\0'):
-            lines = merge.splitlines()
-            if len(lines) < 3:
+            lines = merge.split('\n')
+            if len(lines) != 3:
+                logger.error('cannot parse log output: %s', merge)
                 break
             else:
                 sha1, author, title = lines
