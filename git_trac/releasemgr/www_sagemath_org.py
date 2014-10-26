@@ -28,10 +28,10 @@ def upload_tarball(url):
     if os.path.exists(url):        # is local file
         put(url, os.path.join('/home/sagemath/upstream', os.path.basename(url)))
     else:                          # should be a url
-        with cd('/home/sagemath/upstream'):
-            run('wget ' + url)
+        with cd('/www-data/tmp/upstream'):
+            run('wget -p ' + url)
     with cd('/www-data/sagemath-org/scripts'):
-        run('./mirror_upstream.py /home/sagemath/upstream')
+        run('./mirror_upstream.py /www-data/tmp/upstream')
         run('./mirror-index.py')
         run('./fix_permissions.sh')
     run('/www-data/sagemath-org/go_live.sh')
