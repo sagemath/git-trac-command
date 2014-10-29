@@ -65,7 +65,7 @@ class ReleaseApplication(Application):
         match = self.MILESTONE_RE.search(ticket.milestone)
         return (match is not None)
 
-    def merge(self, ticket_number, close=False, allow_empty=False):
+    def merge(self, ticket_number, close=False, allow_empty=False, ignore_dependencies=False):
         """
         Create the "release" merge
 
@@ -77,10 +77,13 @@ class ReleaseApplication(Application):
         - ``close`` -- boolean. Whether to close the trac ticket.
 
         - ``allow_empty`` -- boolean. Whether to allow empty commits.
+
+        - ``ignore_dependencies`` -- boolean. Whether to check that
+          the dependencies are merged.
         """
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
-        if not self._are_dependencies_merged(ticket):
+        if not (ignore_dependencies or self._are_dependencies_merged(ticket)):
             raise ValueError(u'ticket dependencies are not all merged: {0}'
                              .format(ticket.dependencies))
         if not self._is_valid_milestone(ticket):
@@ -158,9 +161,9 @@ class ReleaseApplication(Application):
                 raise ValueError('merge was not clean')
             self._commit(commit_message)
 
-    def merge_multiple(self, ticket_numbers, close=False, allow_empty=False):
+    def merge_multiple(self, ticket_numbers, close=False, allow_empty=False, ignore_dependencies=False):
         for ticket_number in ticket_numbers:
-            self.merge(ticket_number, close=close, allow_empty=allow_empty)
+            self.merge(ticket_number, close=close, allow_empty=allow_empty, ignore_dependencies=ignore_dependencies)
 
     def close_ticket(self, ticket):
         comment = ''

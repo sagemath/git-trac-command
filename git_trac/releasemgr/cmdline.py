@@ -1,4 +1,4 @@
-## -*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 """
 Handle Command Line Options
 """
@@ -75,6 +75,9 @@ def launch():
     parser_merge.add_argument('--allow-empty', dest='allow_empty', 
                               action='store_true',
                               help='Allow empty commits', default=False)
+    parser_merge.add_argument('--ignore-dependencies', dest='ignore_dependencies', 
+                              action='store_true',
+                              help='Do not check whether dependencies are merged', default=False)
     parser_merge.add_argument('tickets', type=int, nargs='+', help='Ticket number(s)')
 
     # git releasemgr merge-all
@@ -131,7 +134,8 @@ def launch():
         app.print_ticket(args.ticket)
     elif args.subcommand == 'merge':
         app.merge_multiple(args.tickets, close=args.close, 
-                           allow_empty=args.allow_empty)
+                           allow_empty=args.allow_empty,
+                           ignore_dependencies=args.ignore_dependencies)
     elif args.subcommand == 'test':
         app.test_merge(args.ticket)
     elif args.subcommand == 'unmerge':
