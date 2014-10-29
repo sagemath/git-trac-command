@@ -29,7 +29,7 @@ def upload_tarball(url):
         put(url, os.path.join('/home/sagemath/upstream', os.path.basename(url)))
     else:                          # should be a url
         with cd('/www-data/tmp/upstream'):
-            run('wget -p ' + url)
+            run('wget --no-directories -p ' + url)
     with cd('/www-data/sagemath-org/scripts'):
         run('./mirror_upstream.py /www-data/tmp/upstream')
         run('./mirror-index.py')
