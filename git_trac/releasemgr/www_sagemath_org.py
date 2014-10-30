@@ -26,7 +26,7 @@ def upload_tarball(url):
     Add tarball to http://sagemath.org/packages/upstream
     """
     if os.path.exists(url):        # is local file
-        put(url, os.path.join('/home/sagemath/upstream', os.path.basename(url)))
+        put(url, os.path.join('/www-data/tmp/upstream', os.path.basename(url)))
     else:                          # should be a url
         with cd('/www-data/tmp/upstream'):
             run('wget --no-directories -p ' + url)
