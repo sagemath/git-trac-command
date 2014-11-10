@@ -65,7 +65,8 @@ class ReleaseApplication(Application):
         match = self.MILESTONE_RE.search(ticket.milestone)
         return (match is not None)
 
-    def merge(self, ticket_number, close=False, allow_empty=False, ignore_dependencies=False):
+    def merge(self, ticket_number, close=False, allow_empty=False,
+              ignore_dependencies=False, ignore_name=False):
         """
         Create the "release" merge
 
@@ -80,6 +81,9 @@ class ReleaseApplication(Application):
 
         - ``ignore_dependencies`` -- boolean. Whether to check that
           the dependencies are merged.
+
+        - ``ignore_name`` -- boolean. Whether to check that the name 
+          looks right.
         """
         print('Loading ticket...')
         ticket = self.trac.load(ticket_number)
@@ -100,12 +104,13 @@ class ReleaseApplication(Application):
         print(u'Reviewer(s): {0}'.format(ticket.reviewer))
         
         import string
-        if not all(author[0].strip() in string.ascii_uppercase 
-                   for author in ticket.author.split(',')):
-            raise ValueError(u'author {0} does not look right'.format(ticket.author))
-        if not all(reviewer[0].strip() in string.ascii_uppercase 
-                   for reviewer in ticket.reviewer.split(',')):
-            raise ValueError(u'reviewer {0} does not look right'.format(ticket.reviewer))
+        if not ignore_name:
+            if not all(author[0].strip() in string.ascii_uppercase 
+                       for author in ticket.author.split(',')):
+                raise ValueError(u'author {0} does not look right'.format(ticket.author))
+            if not all(reviewer[0].strip() in string.ascii_uppercase 
+                       for reviewer in ticket.reviewer.split(',')):
+                raise ValueError(u'reviewer {0} does not look right'.format(ticket.reviewer))
 
         from .commit_message import format_ticket
         commit_message = format_ticket(ticket)
@@ -161,9 +166,9 @@ class ReleaseApplication(Application):
                 raise ValueError('merge was not clean')
             self._commit(commit_message)
 
-    def merge_multiple(self, ticket_numbers, close=False, allow_empty=False, ignore_dependencies=False):
+    def merge_multiple(self, ticket_numbers, **kwds):
         for ticket_number in ticket_numbers:
-            self.merge(ticket_number, close=close, allow_empty=allow_empty, ignore_dependencies=ignore_dependencies)
+            self.merge(ticket_number, **kwds)
 
     def close_ticket(self, ticket):
         comment = ''
