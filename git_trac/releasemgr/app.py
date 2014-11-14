@@ -272,6 +272,14 @@ class ReleaseApplication(Application):
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
 
+    def dist(self, filename):
+        """
+        Add tarball to http://sage.sagedev.org/home/release/ and mirror
+        """
+        import fabric.tasks
+        from .sagedev_org import upload_dist_tarball
+        fabric.tasks.execute(upload_dist_tarball, tarball)
+
     def release(self, version, check=True):
         from .make_release import update_version, create_tarball, check_tarball, check_upgrade
         update_version(version)

@@ -108,6 +108,10 @@ def launch():
     parser_upstream = subparsers.add_parser('upstream', help='Upload upstream tarball')
     parser_upstream.add_argument('url', type=str, help='Tarball URL')
 
+    # git releasemgr dist <tarball>
+    parser_dist = subparsers.add_parser('dist', help='Upload Sage source tarball')
+    parser_dist.add_argument('tarball', type=str, help='Tarball filename')
+
     # git releasemgr release <version>
     parser_release = subparsers.add_parser('release', help='Create new release')
     parser_release.add_argument('--nocheck', action='store_true', 
@@ -154,6 +158,8 @@ def launch():
         app.merge_all()
     elif args.subcommand == 'upstream':
         app.upstream(args.url)
+    elif args.subcommand == 'dist':
+        app.dist(args.tarball)
     elif args.subcommand == 'release':
         app.release(args.version, check=not args.nocheck)
     else:
