@@ -26,7 +26,7 @@ def upload_dist_tarball(tarball):
     """
     Add tarball to http://sage.sagedev.org/home/release/
     """
-    put(url, os.path.join('~/release', os.path.basename(tarball)))
-    run('ln ~/release/{0} ~/release/pub/{1}'.format(
-        os.path.join('~/release', os.path.basename(tarball))))
+    basename = os.path.basename(tarball)
+    put(tarball, os.path.join('~/release', basename))
+    run('ln ~/release/{0} ~/release/pub/{0}'.format(basename))
     run('sudo -H -u  sagemath /home/sagemath/mirror')
