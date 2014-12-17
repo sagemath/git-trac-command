@@ -35,6 +35,13 @@ Alternatively you can just symlink ``git-trac`` to anywhere in your path:
     $ cd git-trac-command
     $ ln -s `pwd`/git-trac ~/bin/
 
+On a Mac, which may not have a default in the home directory for commands,
+it may be easier to add this to your ``.profile``: 
+
+    $ git clone https://github.com/sagemath/git-trac-command.git
+    $ cd git-trac-command
+    $ pico/vim/emacs $HOME/.profile
+    <add a line like "export PATH=$PATH:$HOME/Downloads/git-trac-command/bin">
 
 Usage
 -----
