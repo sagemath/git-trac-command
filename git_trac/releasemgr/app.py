@@ -272,6 +272,11 @@ class ReleaseApplication(Application):
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
 
+    def upstream_confball(self):
+        version = open('build/pkgs/configure/package-version.txt').read().strip()
+        configure = 'upstream/configure-{0}.tar.gz'.format(version)
+        self.upstream(configure)
+        
     def dist(self, tarball):
         """
         Add tarball to http://sage.sagedev.org/home/release/ and mirror
@@ -280,13 +285,16 @@ class ReleaseApplication(Application):
         from .sagedev_org import upload_dist_tarball
         fabric.tasks.execute(upload_dist_tarball, tarball)
 
-    def release(self, version, check=True):
+    def release(self, version, check=False):
         from .make_release import update_version, create_tarball, check_tarball, check_upgrade
         update_version(version)
         assert version == self.repo.head_version()
         create_tarball()
+        tarball = 'dist/sage-{0}.tar.gz'.format(version)
+        self.upstream_confball()
+        self.dist(tarball)
         if check:
-            check_tarball('dist/sage-{0}.tar.gz'.format(version))
+            check_tarball(tarball)
             stable = self.repo.previous_stable_version()
             check_upgrade(self.git, stable, version)
         

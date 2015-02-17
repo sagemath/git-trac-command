@@ -114,8 +114,8 @@ def launch():
 
     # git releasemgr release <version>
     parser_release = subparsers.add_parser('release', help='Create new release')
-    parser_release.add_argument('--nocheck', action='store_true', 
-                                default=False, help='Skip checks')
+    parser_release.add_argument('--check', action='store_true', 
+                                default=False, help='Extra checks')
     parser_release.add_argument('version', type=str, help='New version string')
 
     # git releasemgr publish
@@ -161,7 +161,7 @@ def launch():
     elif args.subcommand == 'dist':
         app.dist(args.tarball)
     elif args.subcommand == 'release':
-        app.release(args.version, check=not args.nocheck)
+        app.release(args.version, check=args.check)
     else:
         print('Unknown subcommand "{0}"'.format(args.subcommand))
         parser.print_help()
