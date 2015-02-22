@@ -82,7 +82,8 @@ def monkey_patch():
         """
         if args is None:
             args = list(sys.argv)[1:]
-        if len(args) > 0 and args[-1] == '-h':
+        if len(args) == 1 and args[-1] == '-h':
+            # Convert "git-trac -h" to "git-trac help"
             args[-1] = 'help'
         return old_parse_args(self, args)
 
