@@ -28,5 +28,5 @@ def upload_dist_tarball(tarball):
     """
     basename = os.path.basename(tarball)
     put(tarball, os.path.join('~/release', basename))
-    run('ln ~/release/{0} ~/release/pub/{0}'.format(basename))
+    run('ln -f ~/release/{0} ~/release/pub/{0}'.format(basename))
     run('sudo -H -u  sagemath /home/sagemath/mirror')
