@@ -55,6 +55,23 @@ class Application(object):
         result = self.trac.search_branch(branch)
         print(result)
 
+    def fetch(self, ticket_or_branch=None):
+        try:
+            ticket_number = self.guess_ticket_number(ticket_or_branch)
+        except ValueError:
+            # Some more DWIM
+            if ticket_or_branch is not None:
+                # allow "git trac fetch u/user/description" even if not on a ticket
+                # allow "git trac fetch develop" which should never be on a ticket
+                self.repo.fetch(str(ticket_or_branch))
+            else:
+                # Finally, just try "git pull"
+                self.git.fetch()
+            return
+        remote = self.trac.remote_branch(ticket_number)
+        print('remote branch: '+remote)
+        self.repo.fetch(remote)
+
     def pull(self, ticket_or_branch=None):
         try:
             ticket_number = self.guess_ticket_number(ticket_or_branch)

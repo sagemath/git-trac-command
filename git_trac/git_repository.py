@@ -169,6 +169,9 @@ class GitRepository(object):
         """
         self.git.branch(oldname, newname, move=True)
 
+    def fetch(self, remote_branch):
+        self.git.echo.fetch('trac', remote_branch)
+
     def pull(self, remote_branch):
         self.git.echo.fetch('trac', remote_branch)
         self.git.echo.merge('FETCH_HEAD')

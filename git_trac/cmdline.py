@@ -125,6 +125,10 @@ def make_parser():
                                help='Remote git branch name (default: local branch)', 
                                default=None)
 
+    parser_fetch = subparsers.add_parser('fetch', help='Fetch branch from trac ticket')
+    parser_fetch.add_argument('ticket_or_branch', nargs='?', type=TicketOrBranch, 
+                             help='Ticket number or remote branch name', default=None)
+
     parser_pull = subparsers.add_parser('pull', help='Get updates')
     parser_pull.add_argument('ticket_or_branch', nargs='?', type=TicketOrBranch, 
                              help='Ticket number or remote branch name', default=None)
@@ -203,6 +207,8 @@ def launch():
         app.create(args.summary, args.branch_name)
     elif args.subcommand == 'checkout':
         app.checkout(args.ticket_or_branch, args.branch_name)
+    elif args.subcommand == 'fetch':
+        app.pull(args.ticket_or_branch)
     elif args.subcommand == 'pull':
         app.pull(args.ticket_or_branch)
     elif args.subcommand == 'push':
