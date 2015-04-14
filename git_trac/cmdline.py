@@ -208,7 +208,7 @@ def launch():
     elif args.subcommand == 'checkout':
         app.checkout(args.ticket_or_branch, args.branch_name)
     elif args.subcommand == 'fetch':
-        app.pull(args.ticket_or_branch)
+        app.fetch(args.ticket_or_branch)
     elif args.subcommand == 'pull':
         app.pull(args.ticket_or_branch)
     elif args.subcommand == 'push':
