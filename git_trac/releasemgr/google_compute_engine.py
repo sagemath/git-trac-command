@@ -21,17 +21,22 @@ env.user = 'sagemath'
 env.hosts = ['google_compute_engine']
 
 
-def upload_tarball(url):
+def package_name(url_or_path):
+    tarball_name = os.path.basename(url_or_path)
+    return tarball_name.split('-', 1)[0]
+
+
+def upload_tarball(url_or_path):
     """
     Add tarball to http://sagemath.org/packages/upstream
     """
-    assert False, 'TODO'
-    if os.path.exists(url):        # is local file
-        put(url, os.path.join('/home/sagemath/files/devel', os.path.basename(url)))
-    else:                          # should be a url
-        with cd('/home/sagemath/files/devel/'):
-            run('wget --no-directories -p -N ' + url)
-    run('/home/sagemath/website/scripts/mirror-index.py')
+    package = package_name(url_or_path)
+    destination = os.path.join('/home/sagemath/files/spkg/upstream', package)
+    if os.path.exists(url_or_path):        # is local file
+        put(url_or_path, os.path.join(destination, os.path.basename(url_or_path)))
+    else:                                  # should be a url
+        with cd(destination):
+            run('wget --no-directories -p -N ' + url_or_path)
     run('/home/sagemath/publish-files.sh')
 
 
@@ -42,6 +47,5 @@ def upload_dist_tarball(tarball):
     """
     basename = os.path.basename(tarball)
     put(tarball, os.path.join('/home/sagemath/files/devel', basename))
-    run('/home/sagemath/website/scripts/mirror-index.py')
     run('/home/sagemath/publish-files.sh')
 

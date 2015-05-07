@@ -268,7 +268,7 @@ class ReleaseApplication(Application):
         Add tarball to http://sagemath.org/packages/upstream
         """
         import fabric.tasks
-        from .www_sagemath_org import upload_tarball
+        from .google_compute_engine import upload_tarball
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
 
