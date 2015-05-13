@@ -271,6 +271,8 @@ class ReleaseApplication(Application):
         from .google_compute_engine import upload_tarball
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
+        from .sagepad_org import rsync_upstream_packages
+        rsync_upstream_packages()
 
     def upstream_confball(self):
         version = open('build/pkgs/configure/package-version.txt').read().strip()
