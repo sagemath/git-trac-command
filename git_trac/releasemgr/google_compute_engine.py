@@ -32,6 +32,8 @@ def upload_tarball(url_or_path):
     with settings(**env_gce):
         package = package_name(url_or_path)
         destination = os.path.join('/home/sagemath/files/spkg/upstream', package)
+        run('mkdir -p {0}'.format(destination))
+        run('touch {0}'.format(os.path.join(destination, 'index.html')))
         if os.path.exists(url_or_path):        # is local file
             put(url_or_path, os.path.join(destination, os.path.basename(url_or_path)))
         else:                                  # should be a url
