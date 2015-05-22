@@ -73,8 +73,8 @@ class Config(object):
         try:
             return self._load('trac.username')
         except GitError:
-            raise SystemExit('Use "git trac config --user=<name>"'
-                             ' to set your trac username')
+            raise AuthenticationError('Use "git trac config --user=<name>"'
+                                      ' to set your trac username')
 
     @username.setter
     def username(self, value):
@@ -89,9 +89,12 @@ class Config(object):
         try:
             return self._load('trac.password')
         except GitError:
-            raise SystemExit('Use "git trac config --pass=<secret>"'
-                             ' to set your trac password')
+            raise AuthenticationError('Use "git trac config --pass=<secret>"'
+                                      ' to set your trac password')
 
     @password.setter
     def password(self, value):
         self._save('trac.password', value)
+
+class AuthenticationError(Exception):
+    pass

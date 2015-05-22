@@ -306,7 +306,7 @@ class Application(object):
     def save_trac_password(self, password):
         self.config.password = password
         print('Saved trac password.')
-        
+
     def print_config(self, ssh_keys=True):
         """
         Print configuration information
@@ -321,17 +321,28 @@ class Application(object):
             Username: trac_user
             Password: trac_pass
         """
+        from config import AuthenticationError
         c = self.config
         print('Trac xmlrpc URL:')
         print('    {0} (anonymous)'.format(self.trac.url_anonymous))
         print('    {0} (authenticated)'.format(self.trac.url_authenticated))
         print('    realm {0}'.format(c.server_realm))
-        print('Username: {0}'.format(c.username))
-        print('Password: {0}'.format(c.password))
-        if ssh_keys:
-            print('Retrieving SSH keys...')
-            for key in self.trac.get_ssh_fingerprints():
-                print('    {0}'.format(key))
+        try:
+            c.username
+            anonymous_only = False
+        except AuthenticationError:
+            anonymous_only = True
+
+        if anonymous_only:
+            print('Anonymous (read) access only. To configure an account, use:')
+            print('    git trac config --user=<name> --password=<password>')
+        else:
+            print('Username: {0}'.format(c.username))
+            print('Password: {0}'.format(c.password))
+            if ssh_keys:
+                print('Retrieving SSH keys...')
+                for key in self.trac.get_ssh_fingerprints():
+                    print('    {0}'.format(key))
 
     def print_ticket(self, ticket_number):
         """
@@ -438,7 +449,7 @@ class Application(object):
             print('Commit has not been merged by the release manager into your current branch.')
             return
         self.git.echo.show(merge.sha1, '--color=always')
-        
+
     def review_diff(self, ticket_number):
         remote = self.trac.remote_branch(ticket_number)
         diff = self.repo.review_diff(remote)
@@ -446,12 +457,7 @@ class Application(object):
 
     def add_remote(self):
         """
-        Add the "trac" remote if necessary
-        
-        INPUT:
-
-        - ``readonly`` -- boolean. Whether to use ssh or http
-        transport.
+        Add the "trac" remotes (RW+RO) if necessary
         """
         REPO_RW = 'git@trac.sagemath.org:sage.git'
         REPO_RO = 'git://trac.sagemath.org/sage.git'
