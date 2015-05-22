@@ -321,6 +321,7 @@ class Application(object):
             Username: trac_user
             Password: trac_pass
         """
+        from config import AuthenticationError
         c = self.config
         print('Trac xmlrpc URL:')
         print('    {0} (anonymous)'.format(self.trac.url_anonymous))
@@ -329,7 +330,7 @@ class Application(object):
         try:
             c.username
             anonymous_only = False
-        except ValueError:
+        except AuthenticationError:
             anonymous_only = True
 
         if anonymous_only:
