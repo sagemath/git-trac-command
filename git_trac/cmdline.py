@@ -45,7 +45,7 @@ def show_cheat_sheet():
 
 
 def debug_shell(app, parser):
-    from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+    from IPython.terminal.ipapp import TerminalIPythonApp
     ip = TerminalIPythonApp.instance()
     ip.initialize(argv=[])
     ip.shell.user_global_ns['app'] = app
