@@ -24,7 +24,7 @@ Build Stuff for Doctests
 
 
 
-POPULATE_GIT_REPO = """
+POPULATE_GIT_REPO = u"""
 git init .
 git config --local --add user.email "committer@example.com"
 git config --local --add user.name "Jäne Developer (弄火)"
