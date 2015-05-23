@@ -10,7 +10,7 @@ from ..app import Application
 
 from ..people import RELEASE_MANAGER
 
-
+from git_trac.releasemgr.version_string import VersionString
 
 
 class ReleaseApplication(Application):
@@ -19,7 +19,7 @@ class ReleaseApplication(Application):
         """
         INPUT:
 
-        - ``ticket_number`` -- a trac ticket numebr.
+        - ``ticket_number`` -- a trac ticket number.
 
         EXAMPLES:
 
@@ -268,7 +268,7 @@ class ReleaseApplication(Application):
         Add tarball to http://sagemath.org/packages/upstream
         """
         import fabric.tasks
-        from .google_compute_engine import upload_tarball
+        from .www_sagemath_org import upload_tarball
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
         from .sagepad_org import rsync_upstream_packages
@@ -279,22 +279,26 @@ class ReleaseApplication(Application):
         configure = 'upstream/configure-{0}.tar.gz'.format(version)
         self.upstream(configure)
         
-    def dist(self, tarball):
+    def dist(self, tarball, devel=True):
         """
         Add tarball to http://sage.sagedev.org/home/release/ and mirror
         """
         import fabric.tasks
-        from .google_compute_engine import upload_dist_tarball
-        fabric.tasks.execute(upload_dist_tarball, tarball)
+        from .www_sagemath_org import upload_dist_tarball
+        fabric.tasks.execute(upload_dist_tarball, tarball, devel)
 
     def release(self, version, check=False):
+        """
+        Make a new release with the given version string
+        """
+        v = VersionString(version)
         from .make_release import update_version, create_tarball, check_tarball, check_upgrade
         update_version(version)
         assert version == self.repo.head_version()
         create_tarball()
         tarball = 'dist/sage-{0}.tar.gz'.format(version)
         self.upstream_confball()
-        self.dist(tarball)
+        self.dist(tarball, v.is_devel())
         if check:
             check_tarball(tarball)
             stable = self.repo.previous_stable_version()
