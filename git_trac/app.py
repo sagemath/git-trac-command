@@ -321,7 +321,7 @@ class Application(object):
             Username: trac_user
             Password: trac_pass
         """
-        from config import AuthenticationError
+        from git_trac.config import AuthenticationError
         c = self.config
         print('Trac xmlrpc URL:')
         print('    {0} (anonymous)'.format(self.trac.url_anonymous))
