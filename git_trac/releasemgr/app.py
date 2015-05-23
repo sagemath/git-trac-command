@@ -170,7 +170,10 @@ class ReleaseApplication(Application):
         for ticket_number in ticket_numbers:
             self.merge(ticket_number, **kwds)
 
-    def close_ticket(self, ticket):
+    def close_ticket(self, commit, ticket):
+        if ticket.commit != commit.sha1:
+            raise RuntimeError('ticket #{0} branch changed (merged={1}, current={2})'
+                               .format(ticket.number, commit.sha1, ticket.commit))
         comment = ''
         attributes = {
             '_ts': ticket.timestamp,
@@ -185,13 +188,13 @@ class ReleaseApplication(Application):
 
     def close_tickets(self, head, exclude):
         ticket_list = self.repo.release_merges(head, exclude)
-        for commit, ticket_number in ticket_list:
+        for merge_commit, ticket_commit, ticket_number in ticket_list:
             ticket = self.trac.load(ticket_number)
             if ticket.status == 'closed':
                 print('Trac #{0} already closed'.format(ticket_number))
             else:
                 print('Trac #{0}: {1} -> closed'.format(ticket_number, ticket.status))
-                self.close_ticket(ticket)
+                self.close_ticket(ticket_commit, ticket)
                 
     def publish(self):
         tag = self.repo.head_version()

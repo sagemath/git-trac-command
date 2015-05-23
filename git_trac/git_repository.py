@@ -185,6 +185,29 @@ class GitRepository(object):
         self.set_upstream(remote_branch)
 
     def release_merges(self, head, exclude):
+        """
+        Identify the release merges
+
+        INPUT:
+
+        - ``head`` -- commit whose history is considered
+
+        - ``exclude`` -- commit whose history to exclude
+
+        OUTPUT:
+
+        The release merges (made by the release manager, leading to
+        closed tickets). Output is a tuple of triples:
+
+        * First, the commit of the release merge (made by the release
+          manager)
+
+        * Second, the tip commit of the ticket branch (made by the
+          ticket author). This is the second parent of the release
+          merge.
+
+        * Third, the ticket number as integer.
+        """
         log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent', 
                            head, '^'+exclude, author=RELEASE_MANAGER)
         result = []
@@ -197,8 +220,9 @@ class GitRepository(object):
                 number = int(number)
             except ValueError:
                 raise ValueError('failed to convert ticket number to integer: "{0}"'.format(line))
-            commit = GitCommit(self, match.group('sha1'))
-            result.append((commit, number))
+            merge_commit = GitCommit(self, match.group('sha1'))
+            ticket_commit = merge_commit.get_parents()[1]
+            result.append((merge_commit, ticket_commit, number))
         return tuple(result)
 
     def find_release_merge_of_ticket(self, ticket_number):
