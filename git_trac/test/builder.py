@@ -69,13 +69,15 @@ echo 'another line' >> foo4.txt
 touch untracked_file
 """
 
+import locale
 import os
 import tempfile
 import shutil
 import atexit
 
+from subprocess import check_call
 try: 
-    from subprocess import check_output
+    from subprocess import check_output     # new in Python 2.7
 except ImportError:
     from git_trac.py26_compat import check_output
 
@@ -89,6 +91,7 @@ def delete_temp_dirs():
         shutil.rmtree(temp_dir)
 
 
+        
 class GitRepoBuilder(object):
     
     def make_repo(self, verbose, user_email_set):
@@ -108,7 +111,7 @@ class GitRepoBuilder(object):
             os.mkdir(self.trac_remote)
             os.chdir(self.trac_remote)
             for line in POPULATE_GIT_REPO.splitlines():
-                check_output(line, shell=True)
+                check_output(line.encode('utf-8'), shell=True)
         finally:
             os.chdir(cwd)
 
@@ -122,7 +125,7 @@ class GitRepoBuilder(object):
             os.mkdir(self.repo_path)
             os.chdir(self.repo_path)
             for line in POPULATE_GIT_REPO.splitlines():
-                check_output(line, shell=True)
+                check_output(line.encode('utf-8'), shell=True)
             check_output('git remote add trac file://' + self.trac_remote, shell=True)
         finally:
             os.chdir(cwd)
