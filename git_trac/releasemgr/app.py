@@ -271,7 +271,7 @@ class ReleaseApplication(Application):
         Add tarball to http://sagemath.org/packages/upstream
         """
         import fabric.tasks
-        from .www_sagemath_org import upload_tarball
+        from .fileserver_sagemath_org import upload_tarball
         url = url.strip(' \xe2\x80\x8b')
         fabric.tasks.execute(upload_tarball, url)
         from .sagepad_org import rsync_upstream_packages
@@ -287,7 +287,7 @@ class ReleaseApplication(Application):
         Add tarball to http://sage.sagedev.org/home/release/ and mirror
         """
         import fabric.tasks
-        from .www_sagemath_org import upload_dist_tarball
+        from .fileserver_sagemath_org import upload_dist_tarball
         fabric.tasks.execute(upload_dist_tarball, tarball, devel)
 
     def release(self, version, check=False):
