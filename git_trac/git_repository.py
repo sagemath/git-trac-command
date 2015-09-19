@@ -204,7 +204,7 @@ class GitRepository(object):
 
         * Second, the tip commit of the ticket branch (made by the
           ticket author). This is the second parent of the release
-          merge.
+          merge. Can be ``None`` if there is no code on the ticket.
 
         * Third, the ticket number as integer.
         """
@@ -221,7 +221,15 @@ class GitRepository(object):
             except ValueError:
                 raise ValueError('failed to convert ticket number to integer: "{0}"'.format(line))
             merge_commit = GitCommit(self, match.group('sha1'))
-            ticket_commit = merge_commit.get_parents()[1]
+            parents  = merge_commit.get_parents()
+            if len(parents) == 2:
+                # Normal case
+                ticket_commit = merge_commit.get_parents()[1]
+            elif len(parents) == 1:
+                # No code on ticket; slightly weird but ok
+                ticket_commit = None
+            else:
+                assert False, 'can have at most two parents'
             result.append((merge_commit, ticket_commit, number))
         return tuple(result)
 
