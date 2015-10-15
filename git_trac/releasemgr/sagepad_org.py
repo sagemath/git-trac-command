@@ -24,4 +24,5 @@ def rsync_upstream_packages():
     pull upstream packages via rsync
     """
     with settings(**env_sagepad):
-        run('rsync --archive --recursive rsync.sagemath.org::spkgs/upstream /home/files-pub')
+        run('rsync --archive --recursive rsync.sagemath.org::spkgs/upstream /var/www/sage-upstream')
+        
