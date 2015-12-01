@@ -24,6 +24,7 @@ global namespace.
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
+import sys
 import re
 
 from .config import Config
@@ -216,6 +217,10 @@ class Application(object):
             self.trac.set_remote_branch(ticket, remote)
 
     def create(self, summary, branch_name=None):
+        if summary.lower() == 'help':
+            # Common confusion, see http://trac.sagemath.org/ticket/17813
+            print('Use "git trac create -h" for the online help.')
+            sys.exit(0)
         if branch_name is None:
             branch_name = title_to_branch_name(summary)
         remote = self.suggest_remote_branch(branch_name)
