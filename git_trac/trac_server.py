@@ -40,7 +40,7 @@ except ImportError:
     from urllib2 import urlparse as url_parse
 
     
-
+from .logger import logger
 from .trac_ticket import TracTicket
 from .trac_error import TracAuthenticationError
 from .cached_property import cached_property
@@ -88,7 +88,12 @@ class TracServer(object):
             for key in self.get_ssh_keys():
                 with open(tmp, 'w') as f:
                     f.write(key)
-                out = subprocess.check_output(['ssh-keygen', '-lf', tmp])
+                try:
+                    out = subprocess.check_output(['ssh-keygen', '-lf', tmp])
+                except subprocess.CalledProcessError as error:
+                    logger.error(error)
+                    logger.error('The SSH key "{0}" is probably invaild.'.format(key))
+                    raise error
                 yield out.decode('utf-8').strip()
         finally:
             os.remove(tmp)
