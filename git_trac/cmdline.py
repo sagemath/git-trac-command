@@ -35,10 +35,12 @@ def xdg_open(uri):
     import subprocess
     if sys.platform == 'darwin':
         rc = subprocess.call(['open', uri])
+        error = 'Failed to run "open", please open {0}'
     else:
         rc = subprocess.call(['xdg-open', uri])
+        error = 'Failed to run "xdg-open", please open {0}'
     if rc != 0: 
-        print('Failed to run "xdg-open", please open {0}'.format(uri))
+        print(error.format(uri))
 
 
 def show_cheat_sheet():
