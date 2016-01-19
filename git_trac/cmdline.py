@@ -33,7 +33,10 @@ from .ticket_or_branch import TicketOrBranch
 
 def xdg_open(uri):
     import subprocess
-    rc = subprocess.call(['xdg-open', uri])
+    if sys.platform == 'darwin':
+        rc = subprocess.call(['open', uri])
+    else:
+        rc = subprocess.call(['xdg-open', uri])
     if rc != 0: 
         print('Failed to run "xdg-open", please open {0}'.format(uri))
 
