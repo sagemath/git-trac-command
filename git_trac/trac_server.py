@@ -86,6 +86,10 @@ class TracServer(object):
             fd, tmp = tempfile.mkstemp()
             os.close(fd)
             for key in self.get_ssh_keys():
+                key = key.strip()
+                if not key:
+                    logger.debug('Skipping empty ssh key line')
+                    continue
                 with open(tmp, 'w') as f:
                     f.write(key)
                 try:
