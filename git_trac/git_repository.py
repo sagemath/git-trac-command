@@ -99,6 +99,19 @@ class GitRepository(object):
         branch = lremove(branch, 'heads/')
         return branch
 
+    def has_branch(self, branch_name):
+        """
+        Test whether branch exists in the local repo
+
+            sage: curr = repo.current_branch()
+            sage: repo.has_branch(curr)
+            True
+            sage: repo.has_branch('ceci_n_est_pas_une_branche')
+            False
+        """
+        rc = self.git.exit_code.rev_parse(branch_name, verify=True)
+        return rc == 0
+    
     def checkout_new_branch(self, remote, local):
         """
         Check out branch.

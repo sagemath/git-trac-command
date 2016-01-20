@@ -126,8 +126,12 @@ class Application(object):
             branch_name = title_to_branch_name(ticket.title)
             remote = self.suggest_remote_branch(branch_name)
             local = self.suggest_local_branch(ticket_number, remote)
-            print('Newly created local branch: {0}'.format(local))
-            self.repo.create(local)
+            if self.repo.has_branch(local):
+                print('Local branch: {0}'.format(local))
+                self.repo.checkout_new_branch(remote, local)
+            else:
+                print('Newly created local branch: {0}'.format(local))
+                self.repo.create(local)
             return
         if branch_name is None:
             branch = self.suggest_local_branch(ticket_number, ticket.branch)
