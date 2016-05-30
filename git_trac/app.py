@@ -344,7 +344,7 @@ class Application(object):
 
         if anonymous_only:
             print('Anonymous (read) access only. To configure an account, use:')
-            print('    git trac config --user=<name> --password=<password>')
+            print('    git trac config --user=<name> --pass=<password>')
         else:
             print('Username: {0}'.format(c.username))
             print('Password: {0}'.format(c.password))
