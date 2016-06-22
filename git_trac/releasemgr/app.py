@@ -97,7 +97,7 @@ class ReleaseApplication(Application):
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
             
-        print(u'URL: http://trac.sagemath.org/{0}'.format(ticket.number))
+        print(u'URL: https://trac.sagemath.org/{0}'.format(ticket.number))
         print(u'Trac #{0}: {1}'.format(ticket.number, ticket.title))
         print(u'Branch {0}'.format(branch))
         print(u'Author(s): {0}'.format(ticket.author))
@@ -263,7 +263,7 @@ class ReleaseApplication(Application):
             t = self.trac.load(ticket_number)
             print(u'')
             print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-            print(u'  URL: http://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
+            print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
             print(u'  Error: ' + error_message)
 
     def upstream(self, url):

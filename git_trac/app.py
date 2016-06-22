@@ -222,7 +222,7 @@ class Application(object):
 
     def create(self, summary, branch_name=None):
         if summary.lower() == 'help':
-            # Common confusion, see http://trac.sagemath.org/ticket/17813
+            # Common confusion, see https://trac.sagemath.org/ticket/17813
             print('Use "git trac create -h" for the online help.')
             sys.exit(0)
         if branch_name is None:
@@ -231,7 +231,7 @@ class Application(object):
         print('Remote branch: {0}'.format(remote))
         ticket_number = self.trac.create(summary, '')
         print('Newly-created ticket number: {0}'.format(ticket_number))
-        print('Ticket URL: http://trac.sagemath.org/{0}'.format(ticket_number))
+        print('Ticket URL: https://trac.sagemath.org/{0}'.format(ticket_number))
         local = self.suggest_local_branch(ticket_number, remote)
         print('Local branch: {0}'.format(local))
         self.repo.create(local)
@@ -324,8 +324,8 @@ class Application(object):
 
             sage: app.print_config(False)
             Trac xmlrpc URL:
-                http://trac.sagemath.org/xmlrpc (anonymous)
-                http://trac.sagemath.org/login/xmlrpc (authenticated)
+                https://trac.sagemath.org/xmlrpc (anonymous)
+                https://trac.sagemath.org/login/xmlrpc (authenticated)
                 realm sage.math.washington.edu
             Username: trac_user
             Password: trac_pass
@@ -428,7 +428,7 @@ class Application(object):
             This ticket is used in the docs for the dev scripts, apologies for spamming...
             (under normal use the doctests of course do not modify trac tickets)
             ------------------------------------------------------------------------------
-            URL: http://trac.sagemath.org/1000
+            URL: https://trac.sagemath.org/1000
             ==============================================================================
         """
         ticket = self.trac.load(ticket_number)

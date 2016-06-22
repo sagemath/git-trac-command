@@ -190,7 +190,7 @@ The scripts assume that the trac remote repository is set up as the
 remote ``trac`` in the local repo. That is, you should have the
 following for the Sage git server:
 
-    $ git remote add trac http://trac.sagemath.org/sage.git      # read-only
+    $ git remote add trac https://trac.sagemath.org/sage.git      # read-only
     $ git remote add trac ssh://git@trac.sagemath.org/sage.git   # read-write
     $ git remote -v
     trac	ssh://git@trac.sagemath.org/sage.git (fetch)
@@ -201,8 +201,8 @@ DOT_GIT/config file):
   
     $ git trac config --user=Myself --pass=s3kr1t
     Trac xmlrpc URL:
-        http://trac.sagemath.org/xmlrpc (anonymous)
-        http://trac.sagemath.org/login/xmlrpc (authenticated)
+        https://trac.sagemath.org/xmlrpc (anonymous)
+        https://trac.sagemath.org/login/xmlrpc (authenticated)
     Username: Myself
     Password: s3kr1t
 

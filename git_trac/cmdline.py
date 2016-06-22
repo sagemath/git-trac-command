@@ -237,7 +237,7 @@ def launch():
         app.print_dependencies(ticket_number)
     elif args.subcommand == 'browse':
         ticket_number = app.guess_ticket_number(args.ticket)
-        xdg_open('http://trac.sagemath.org/{0}'.format(ticket_number))
+        xdg_open('https://trac.sagemath.org/{0}'.format(ticket_number))
     elif args.subcommand == 'log':
         app.log(args.ticket, oneline=args.oneline)
     elif args.subcommand == 'find':

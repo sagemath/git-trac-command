@@ -50,7 +50,7 @@ class Config(object):
 
     @property
     def server_hostname(self):
-        return 'http://trac.sagemath.org'
+        return 'https://trac.sagemath.org'
 
     @property
     def server_realm(self):

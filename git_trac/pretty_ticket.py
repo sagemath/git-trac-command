@@ -37,7 +37,7 @@ EXAMPLES:
     Keywords: Keywords
     Dependencies: Dependencies
     ------------------------------------------------------------------------------
-    URL: http://trac.sagemath.org/1234
+    URL: https://trac.sagemath.org/1234
     ==============================================================================
 """
 
@@ -160,7 +160,7 @@ Comment #{change.number} by {change.author} at {change.ctime} UTC:
 """
 
 FOOTER_TEMPLATE = u"""
-URL: http://trac.sagemath.org/{ticket.number}
+URL: https://trac.sagemath.org/{ticket.number}
 """ + '=' * 78
 
 

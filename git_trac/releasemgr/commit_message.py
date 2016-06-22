@@ -29,7 +29,7 @@ EXAMPLES::
     <BLANKLINE>
     description äöü
     <BLANKLINE>
-    URL: http://trac.sagemath.org/1234
+    URL: https://trac.sagemath.org/1234
     Reported by: Reporter
     Ticket author(s): Ingólfur Eðvarðsson
     Reviewer(s): Reviewer
@@ -49,7 +49,7 @@ Trac #{ticket.number}: {ticket.title}
 DESCRIPTION_TEMPLATE = u"""
 {ticket.description}
 
-URL: http://trac.sagemath.org/{ticket.number}
+URL: https://trac.sagemath.org/{ticket.number}
 Reported by: {ticket.reporter}
 Ticket author(s): {ticket.author}
 Reviewer(s): {ticket.reviewer}
