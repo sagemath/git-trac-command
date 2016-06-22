@@ -32,6 +32,7 @@ class Config(object):
 
     def __init__(self, git):
         self._git = git
+        self._debug = False
 
     def _save(self, config_option, value):
         try:
@@ -43,7 +44,15 @@ class Config(object):
 
     def _load(self, config_option):
         return self._git.config('--get', config_option).strip()
-        
+
+    @property
+    def debug(self):
+        return self._debug
+
+    @debug.setter
+    def debug(self, value):
+        self._debug = bool(value)
+    
     @property
     def version(self):
         return 1

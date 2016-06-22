@@ -205,6 +205,7 @@ def launch():
 
     if args.debug:
         print(args)
+        app.config.debug = True
         debug_shell(app, parser)
     elif args.option_help:
         parser.print_help()

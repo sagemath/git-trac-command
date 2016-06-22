@@ -121,7 +121,7 @@ class DigestTransport(object, SafeTransport):
         try:
             import urlparse
             req = urllib2.Request(
-                    urlparse.urlunparse(('http', host, handler, '', '', '')),
+                    urlparse.urlunparse(('https', host, handler, '', '', '')),
                     request_body, {'Content-Type': 'text/xml',
                         'User-Agent': self.user_agent})
             response = self.opener.open(req)

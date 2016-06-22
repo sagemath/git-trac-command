@@ -64,7 +64,11 @@ class TracServer(object):
     @cached_property 
     def anonymous_proxy(self):
         transport = DigestTransport()
-        return ServerProxy(self.url_anonymous, transport=transport)
+        return ServerProxy(
+            self.url_anonymous,
+            transport=transport,
+            verbose=self.config.debug
+        )
 
     @cached_property 
     def authenticated_proxy(self):
@@ -73,7 +77,11 @@ class TracServer(object):
             url=self.config.server_hostname, 
             username=self.config.username, 
             password=self.config.password)
-        return ServerProxy(self.url_authenticated, transport=transport)
+        return ServerProxy(
+            self.url_authenticated,
+            transport=transport,
+            verbose=self.config.debug
+        )
 
     def get_ssh_keys(self):
         return self.authenticated_proxy.sshkeys.getkeys()
