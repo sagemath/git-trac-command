@@ -96,7 +96,7 @@ class DigestTransport(SafeTransport):
                'keywords': '',
                'resolution': 'fixed'}],)
         """
-        url =  urllib.parse.urlunparse(('http', host, handler, '', '', ''))
+        url =  urllib.parse.urlunparse(('https', host, handler, '', '', ''))
         try:
             req = urllib.request.Request(
                 url, request_body, 
