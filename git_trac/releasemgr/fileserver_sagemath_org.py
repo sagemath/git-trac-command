@@ -14,7 +14,7 @@ except ImportError:
 
 env_sagemath = dict(
     use_ssh_config=True,
-    user='sagemath',
+    user='files',
     host_string='fileserver',
 )
 
@@ -30,7 +30,7 @@ def upload_tarball(url_or_path):
     """
     with settings(**env_sagemath):
         package = package_name(url_or_path)
-        destination = os.path.join('/data/files/spkg/upstream', package)
+        destination = os.path.join('/home/files/files/spkg/upstream', package)
         run('mkdir -p {0}'.format(destination))
         run('touch {0}'.format(os.path.join(destination, 'index.html')))
         if os.path.exists(url_or_path):        # is local file
@@ -38,7 +38,7 @@ def upload_tarball(url_or_path):
         else:                                  # should be a url
             with cd(destination):
                 run('wget --no-directories -p -N ' + url_or_path)
-        run('/data/publish-files.sh')
+        run('/home/files/publish-files.sh')
 
 
 def upload_dist_tarball(tarball, devel=True):
@@ -50,13 +50,13 @@ def upload_dist_tarball(tarball, devel=True):
     - ``devel`` -- boolean. Whether this is a beta/rc release.
     """
     if devel:
-        destination = '/data/files/devel'
+        destination = '/home/files/files/devel'
     else:
-        destination = '/data/files/src'
+        destination = '/home/files/files/src'
     with settings(**env_sagemath):
         basename = os.path.basename(tarball)
         put(tarball, os.path.join(destination, basename))
-        run('/data/publish-files.sh')
+        run('/home/files/publish-files.sh')
 
 
 
