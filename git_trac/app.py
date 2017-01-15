@@ -117,7 +117,29 @@ class Application(object):
         else:
             branch = str(ticket_or_branch)
             self.repo.checkout_new_branch(branch, branch)
-            
+
+    def old(self, ticket_or_branch, branch_name=None):
+        if ticket_or_branch.is_number():
+            ticket_number = int(ticket_or_branch)
+            print('Loading ticket #{0}...'.format(ticket_number))
+            ticket = self.trac.load(ticket_number)
+            if len(ticket.branch) == 0:
+                raise ValueError('No branch attached to #{0}'.format(ticket_number))
+            remote = ticket.branch
+            local = self._validate_branch(branch_name, ticket_number, ticket)
+        else:
+            remote = local = str(ticket_or_branch)
+        self.repo.merge_into_develop(remote, local)
+
+    def _validate_branch(self, branch_name, ticket_number, ticket):
+        if branch_name is None:
+            branch = self.suggest_local_branch(ticket_number, ticket.branch)
+        else:
+            branch = branch_name.strip()
+            if len(branch) == 0:
+                raise ValueError('no local branch specified')
+        return branch
+
     def _checkout_ticket(self, ticket_number, branch_name=None):
         print('Loading ticket #{0}...'.format(ticket_number))
         ticket = self.trac.load(ticket_number)
@@ -133,12 +155,7 @@ class Application(object):
                 print('Newly created local branch: {0}'.format(local))
                 self.repo.create(local)
             return
-        if branch_name is None:
-            branch = self.suggest_local_branch(ticket_number, ticket.branch)
-        else:
-            branch = branch_name.strip()
-            if len(branch) == 0:
-                raise ValueError('no local branch specified')
+        branch = self._validate_branch(branch_name, ticket_number, ticket)
         print('Checking out Trac #{0} remote branch {1} -> local branch {2}...'
               .format(ticket_number, ticket.branch, branch))
         self.repo.checkout_new_branch(ticket.branch, branch)

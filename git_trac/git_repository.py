@@ -24,7 +24,7 @@ operations.
 ##############################################################################
 
 
-import re        
+import re, os
 import textwrap
 
 from .cached_property import cached_property
@@ -53,7 +53,7 @@ class GitRepository(object):
     def master(self):
         head = self.git.show_ref('master', head=True)
         return GitCommit(self, head[0:40])
-    
+
     @property
     def head(self):
         head = self.git.show_ref('HEAD', head=True)
@@ -138,10 +138,33 @@ class GitRepository(object):
         self.git.checkout(local)
         self.set_upstream(remote)
 
+    def merge_into_develop(self, remote, local):
+        self.git.fetch('trac', 'develop')
+        if self.git.exit_code.show_ref('refs/heads/' + local) == 0:
+            # local branch exists
+            # We don't use working_tree since there's no risk
+            # of checking out a very old branch
+            current_branch = self.git.show_ref('refs/heads/' + local, hash=True)
+            try:
+                self.git.branch(local,'FETCH_HEAD',f=True)
+                self.git.checkout(local)
+                self.git.merge(current_branch)
+                print('Merged local branch into develop.')
+            except GitError:
+                self.git.branch(local,current_branch,f=True)
+                print('Merge of local branch into develop failed.')
+                return
+        else:
+            self.git.branch(local, 'FETCH_HEAD')
+        self.git.checkout(local)
+        self.set_upstream(remote)
+        self.git.fetch('trac',remote)
+        self.git.merge('FETCH_HEAD')
+
     def create(self, local, starting_branch='develop'):
         """
         Create new branch.
-        """            
+        """
         self.git.fetch('trac', starting_branch)
         self.git.branch(local, 'FETCH_HEAD')
         self.git.checkout(local)

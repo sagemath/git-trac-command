@@ -125,6 +125,13 @@ def make_parser():
     parser_checkout.add_argument('ticket_or_branch', type=TicketOrBranch, 
                                  help='Ticket number or remote branch name')
 
+    parser_old = subparsers.add_parser('old', help='Download branch, merge into develop')
+    parser_old.add_argument('-b', '--branch', dest='branch_name',
+                            help='Local branch name',
+                            default=None)
+    parser_old.add_argument('ticket_or_branch', type=TicketOrBranch,
+                            help='Ticket number or remote branch name')
+
     parser_search = subparsers.add_parser('search', help='Search trac')
     parser_search.add_argument('--branch', dest='branch_name', 
                                help='Remote git branch name (default: local branch)', 
@@ -213,6 +220,8 @@ def launch():
         app.create(args.summary, args.branch_name)
     elif args.subcommand == 'checkout':
         app.checkout(args.ticket_or_branch, args.branch_name)
+    elif args.subcommand == 'old':
+        app.old(args.ticket_or_branch, args.branch_name)
     elif args.subcommand == 'fetch':
         app.fetch(args.ticket_or_branch)
     elif args.subcommand == 'pull':
