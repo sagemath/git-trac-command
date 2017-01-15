@@ -4,10 +4,11 @@ import re
 
 
 class VersionString(object):
-
-    V_BETA   = re.compile(r'^[0-9]+\.[0-9]+\.beta[0-9]+$')
-    V_RC     = re.compile(r'^[0-9]+\.[0-9]+\.rc[0-9]+$')
-    V_STABLE = re.compile(r'^[0-9]+\.[0-9]+$')
+ 
+    V_BETA    = re.compile(r'^[0-9]+\.[0-9]+\.beta[0-9]+$')
+    V_RC      = re.compile(r'^[0-9]+\.[0-9]+\.rc[0-9]+$')
+    V_STABLE  = re.compile(r'^[0-9]+\.[0-9]+$')
+    V_STABLE2 = re.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$')
     
     def __init__(self, version):
         self.version = version
@@ -59,7 +60,8 @@ class VersionString(object):
             sage: VersionString('6.8').is_stable()
             True
         """
-        return bool(self.V_STABLE.match(self.version))
+        return bool(self.V_STABLE.match(self.version) or
+                    self.V_STABLE2.match(self.version))
 
     def is_devel(self):
         """
