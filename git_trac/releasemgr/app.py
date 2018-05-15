@@ -130,7 +130,7 @@ class ReleaseApplication(Application):
         else:
             if 'All conflicts fixed but you are still merging.' not in status:
                 conflicts = self.git.diff('--name-only', '--diff-filter=U')
-                conflicts = ','.join(conflicts.split('\n'))
+                conflicts = ','.join(conflicts.splitlines())
                 self.git.merge('--abort')
                 raise ValueError('merge was not clean: conflicts in {}'.format(conflicts))
             self._commit(commit_message)
