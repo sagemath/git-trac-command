@@ -129,8 +129,10 @@ class ReleaseApplication(Application):
             self._commit(commit_message, allow_empty=True)
         else:
             if 'All conflicts fixed but you are still merging.' not in status:
+                conflicts = self.git.diff('--name-only', '--diff-filter=U')
+                conflicts = ','.join(conflicts.split('\n'))
                 self.git.merge('--abort')
-                raise ValueError('merge was not clean')
+                raise ValueError('merge was not clean: conflicts in {}'.format(conflicts))
             self._commit(commit_message)
 
         if close:
