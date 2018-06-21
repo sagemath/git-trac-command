@@ -105,5 +105,22 @@ class Config(object):
     def password(self, value):
         self._save('trac.password', value)
 
+    @property
+    def token(self):
+        try:
+            return os.environ['TRAC_TOKEN']
+        except KeyError:
+            pass
+        try:
+            return self._load('trac.token')
+        except GitError:
+            raise AuthenticationError('Use "git trac config --token=<token>"'
+                                      ' to set your trac authentication token')
+
+    @token.setter
+    def token(self, value):
+        self._save('trac.token', value)
+
+
 class AuthenticationError(Exception):
     pass
