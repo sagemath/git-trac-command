@@ -17,21 +17,6 @@ from .trac_error import (
     TracInternalError, TracAuthenticationError, TracConnectionError)
 
 
-class TokenAuthHandler(urllib.BaseHandler):
-    def __init__(self, token=''):
-        super(TokenAuthHandler, self).__init__()
-        self._token = token
-
-    def http_request(self, req):
-        if not req.has_header('Authorization'):
-            auth = 'Bearer ' + self._token
-            req.add_unredirected_header(
-                'Authorization', auth.strip())
-
-        return req
-
-    https_request = http_request
-
 
 class TokenAuthenticatedTransport(SafeTransport, object):
     def __init__(self, token):
