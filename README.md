@@ -204,12 +204,20 @@ DOT_GIT/config file):
         https://trac.sagemath.org/xmlrpc (anonymous)
         https://trac.sagemath.org/login/xmlrpc (authenticated)
     Username: Myself
-    Password: s3kr1t
+    Password: ******
 
-If you do not want to store your trac username/password on disk you
+Instead of a username and password you may also configure authentication via
+a generated token.  **This is required if you authenticate to Trac with your
+GitHub account, as you do not have a Trac password.**.  Logged in users
+can find their token under https://trac.sagmath.org/prefs/token
+
+If both a token and a username/password are configured, the token-based
+authentication takes precedence.
+
+If you do not want to store your trac username/password/token on disk you
 can temporarily override it with the environment variables
-``TRAC_USERNAME`` and ``TRAC_PASSWORD``. These take precedence over
-any other configuration.
+``TRAC_USERNAME``,  ``TRAC_PASSWORD``, and ``TRAC_TOKEN`` respectively.
+These take precedence over any other configuration.
 
 
 Sage-Trac Specifics
