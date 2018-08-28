@@ -198,7 +198,7 @@ following for the Sage git server:
 
 Trac username and password are stored in the local repo (the
 DOT_GIT/config file):
-  
+
     $ git trac config --user=Myself --pass=s3kr1t
     Trac xmlrpc URL:
         https://trac.sagemath.org/xmlrpc (anonymous)
@@ -207,9 +207,14 @@ DOT_GIT/config file):
     Password: ******
 
 Instead of a username and password you may also configure authentication via
-a generated token.  **This is required if you authenticate to Trac with your
-GitHub account, as you do not have a Trac password.**.  Logged in users
-can find their token under https://trac.sagmath.org/prefs/token
+a generated token by passing `--token=<token>` instead of `--user` and
+`--pass`:
+
+    $ git trac config --token=<token>
+
+**This is required if you authenticate to Trac with your GitHub account, as
+you do not have a Trac password.**.  Logged in users can find their token
+under https://trac.sagmath.org/prefs/token
 
 If both a token and a username/password are configured, the token-based
 authentication takes precedence.
