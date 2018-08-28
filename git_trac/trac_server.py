@@ -39,7 +39,10 @@ except ImportError:
     from .digest_transport_py2 import DigestTransport, AuthenticatedDigestTransport
     from urllib2 import urlparse as url_parse
 
-    
+from .token_transport import TokenAuthenticatedTransport
+
+
+from .config import AuthenticationError
 from .logger import logger
 from .trac_ticket import TracTicket
 from .trac_error import TracAuthenticationError
@@ -70,15 +73,30 @@ class TracServer(object):
             verbose=self.config.debug
         )
 
-    @cached_property 
+    @cached_property
     def authenticated_proxy(self):
-        transport = AuthenticatedDigestTransport(
-            realm=self.config.server_realm, 
-            url=self.config.server_hostname, 
-            username=self.config.username, 
-            password=self.config.password)
+        try:
+            # First try to use token authentication, if provided
+            token = self.config.token
+        except AuthenticationError:
+            # This implies that a token was not configured; fall back
+            # to original HTTP digest authenticated transport
+            transport = AuthenticatedDigestTransport(
+                realm=self.config.server_realm,
+                url=self.config.server_hostname,
+                username=self.config.username,
+                password=self.config.password)
+            endpoint_url = self.url_authenticated
+        else:
+            transport = TokenAuthenticatedTransport(token=token)
+            # Ironically, the way Sage's Trac is currently configured,
+            # token-based authentication must go through the "anonymous"
+            # URL, since the authenticated URL forces HTTP Digest
+            # authentication only
+            endpoint_url = self.url_anonymous
+
         return ServerProxy(
-            self.url_authenticated,
+            endpoint_url,
             transport=transport,
             verbose=self.config.debug
         )

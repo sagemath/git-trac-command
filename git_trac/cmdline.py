@@ -183,6 +183,11 @@ def make_parser():
                                help='Trac username', default=None)
     parser_config.add_argument('--pass', dest='trac_pass', 
                                help='Trac password', default=None)
+    parser_config.add_argument('--token', dest='trac_token',
+                               help="Trac authentication token (this can "
+                                    "be used in lieu of username/password "
+                                    "and must be used if you authenticate "
+                                    "with Trac via GitHub)")
 
     parser_cheatsheet = subparsers.add_parser('cheat-sheet', help='Show the git trac cheat sheet')
 
@@ -255,6 +260,8 @@ def launch():
             app.save_trac_username(args.trac_user)
         if args.trac_pass is not None:
             app.save_trac_password(args.trac_pass)
+        if args.trac_token is not None:
+            app.save_trac_token(args.trac_token)
         app.print_config()
     elif args.subcommand == 'cheat-sheet':
         show_cheat_sheet()
