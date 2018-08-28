@@ -255,8 +255,8 @@ class TracTicket_class(object):
                     break
             yield tuple(c[1] for c in sorted(accumulator))
             if stop:
-                raise StopIteration
-        
+                break
+
     @property
     def author(self):
         return self._data.get('author', '<no author>')

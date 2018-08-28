@@ -56,7 +56,7 @@ class ReleaseApplication(Application):
             # commit is merged, good
         return True
 
-    MILESTONE_RE = re.compile('sage-[0-9]*\.[0-9\.]*')
+    MILESTONE_RE = re.compile(r'sage-[0-9]*\.[0-9\.]*')
 
     def _is_valid_milestone(self, ticket):
         """

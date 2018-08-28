@@ -31,8 +31,8 @@ from .config import Config
 from .git_repository import GitRepository
 from .trac_server import TracServer
 
-TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]{2,})([-_/]|$)')
-TICKET_WITH_NUMBER_REGEX = re.compile('^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
+TICKET_NUMBER_IN_BRANCH_REGEX = re.compile(r'[-_/]([0-9]{2,})([-_/]|$)')
+TICKET_WITH_NUMBER_REGEX = re.compile(r'^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
 
 
 def title_to_branch_name(title):
