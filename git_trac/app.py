@@ -31,8 +31,8 @@ from .config import Config
 from .git_repository import GitRepository
 from .trac_server import TracServer
 
-TICKET_NUMBER_IN_BRANCH_REGEX = re.compile('[-_/]([0-9]{2,})([-_/]|$)')
-TICKET_WITH_NUMBER_REGEX = re.compile('^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
+TICKET_NUMBER_IN_BRANCH_REGEX = re.compile(r'[-_/]([0-9]{2,})([-_/]|$)')
+TICKET_WITH_NUMBER_REGEX = re.compile(r'^t(icket)?/(?P<number>\d+)/(?P<name>.*)$')
 
 
 def title_to_branch_name(title):
@@ -92,13 +92,13 @@ class Application(object):
 
     def suggest_local_branch(self, ticket_number, remote_branch):
         """
-        Return a local branch name 
+        Return a local branch name
 
         EXAMPLES::
 
             sage: print(app.suggest_local_branch(123, 'public/foo/bar'))
             t/123/public/foo/bar
-            sage: print(app.suggest_local_branch(123, 'u/some_user/foo/bar'))      
+            sage: print(app.suggest_local_branch(123, 'u/some_user/foo/bar'))
             t/123/foo/bar
             sage: print(app.suggest_local_branch(123, 'foo/bar'))
             t/123/foo/bar
@@ -117,7 +117,7 @@ class Application(object):
         else:
             branch = str(ticket_or_branch)
             self.repo.checkout_new_branch(branch, branch)
-            
+
     def _checkout_ticket(self, ticket_number, branch_name=None):
         print('Loading ticket #{0}...'.format(ticket_number))
         ticket = self.trac.load(ticket_number)
@@ -164,10 +164,10 @@ class Application(object):
         close as possible to ``template``.
 
         EXAMPLES::
- 
+
             sage: print(app.suggest_remote_branch('public/foo/bar'))
             public/foo/bar
-            sage: print(app.suggest_remote_branch('u/some_user/foo/bar'))      
+            sage: print(app.suggest_remote_branch('u/some_user/foo/bar'))
             u/trac_user/foo/bar
             sage: print(app.suggest_remote_branch('foo/bar'))
             u/trac_user/foo/bar
@@ -250,7 +250,7 @@ class Application(object):
         returned.
 
         EXAMPLES::
-        
+
             sage: print(app.repo.current_branch())
             public/1002/anything
             sage: app.guess_ticket_number(None)
@@ -364,7 +364,7 @@ class Application(object):
             sage: app.print_ticket(1000)
             ==============================================================================
             Trac #1000: Sage does not have 10000 users yet.
-            <BLANKLINE>            
+            <BLANKLINE>
             ADD DESCRIPTION
             Status: closed                          Component: distribution
             Last modified: 2013-10-05 21:16:12      Created: 2007-10-25 16:48:05 UTC
@@ -415,12 +415,12 @@ class Application(object):
             from google analytics shows that sage has stayed above 10,000 users -- by that
             metric -- every month for the last year.   However, just barely! There were
             only 11,530 unique returning visitors in July, 2013.
-            <BLANKLINE>            
+            <BLANKLINE>
             For the record, the number of unique returning visitors per month for
             sagenb.org is between 3500 and 8000 over this same period.
-            <BLANKLINE>            
+            <BLANKLINE>
             For https://cloud.sagemath.com, it's between 0 and 2856.
-            <BLANKLINE>            
+            <BLANKLINE>
             (I hope having a description doesn't mess up the dev scripts!)
             [Report Upstream] set to N/A
             ------------------------------------------------------------------------------

@@ -56,7 +56,7 @@ class ReleaseApplication(Application):
             # commit is merged, good
         return True
 
-    MILESTONE_RE = re.compile('sage-[0-9]*\.[0-9\.]*')
+    MILESTONE_RE = re.compile(r'sage-[0-9]*\.[0-9\.]*')
 
     def _is_valid_milestone(self, ticket):
         """
@@ -82,7 +82,7 @@ class ReleaseApplication(Application):
         - ``ignore_dependencies`` -- boolean. Whether to check that
           the dependencies are merged.
 
-        - ``ignore_name`` -- boolean. Whether to check that the name 
+        - ``ignore_name`` -- boolean. Whether to check that the name
           looks right.
         """
         print('Loading ticket...')
@@ -96,25 +96,25 @@ class ReleaseApplication(Application):
         branch = ticket.branch.strip()
         if len(branch) == 0:
             raise ValueError('no branch on ticket')
-            
+
         print(u'URL: https://trac.sagemath.org/{0}'.format(ticket.number))
         print(u'Trac #{0}: {1}'.format(ticket.number, ticket.title))
         print(u'Branch {0}'.format(branch))
         print(u'Author(s): {0}'.format(ticket.author))
         print(u'Reviewer(s): {0}'.format(ticket.reviewer))
-        
+
         import string
         if not ignore_name:
-            if not all(author[0].strip() in string.ascii_uppercase 
+            if not all(author[0].strip() in string.ascii_uppercase
                        for author in ticket.author.split(',')):
                 raise ValueError(u'author {0} does not look right'.format(repr(ticket.author)))
-            if not all(reviewer[0].strip() in string.ascii_uppercase 
+            if not all(reviewer[0].strip() in string.ascii_uppercase
                        for reviewer in ticket.reviewer.split(',')):
                 raise ValueError(u'reviewer {0} does not look right'.format(repr(ticket.reviewer)))
 
         from .commit_message import format_ticket
         commit_message = format_ticket(ticket)
-        
+
         print('Fetching remote branch...')
         self.git.echo.fetch('trac', branch)
 
@@ -195,7 +195,7 @@ class ReleaseApplication(Application):
             else:
                 print('Trac #{0}: {1} -> closed'.format(ticket_number, ticket.status))
                 self.close_ticket(ticket_commit, ticket)
-                
+
     def publish(self):
         tag = self.repo.head_version()
         self.git.push('--tags', 'trac', 'develop')
@@ -220,12 +220,12 @@ class ReleaseApplication(Application):
         querystr = '&'.join([
             'status=positive_review',
             'milestone!=sage-duplicate/invalid/wontfix',
-	    'milestone!=sage-feature',
-	    'milestone!=sage-pending',
-	    'milestone!=sage-wishlist',
+        'milestone!=sage-feature',
+        'milestone!=sage-pending',
+        'milestone!=sage-wishlist',
         ])
         return self.trac.anonymous_proxy.ticket.query(querystr)
-        
+
     def todo(self):
         """
         Print a list of tickets that are ready to be merged
@@ -263,7 +263,7 @@ class ReleaseApplication(Application):
             t = self.trac.load(ticket_number)
             print(u'')
             print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-            print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))  
+            print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
             print(u'  Error: ' + error_message)
 
     def upstream(self, url):
@@ -281,7 +281,7 @@ class ReleaseApplication(Application):
         version = open('build/pkgs/configure/package-version.txt').read().strip()
         configure = 'upstream/configure-{0}.tar.gz'.format(version)
         self.upstream(configure)
-        
+
     def dist(self, tarball, devel=True):
         """
         Add tarball to http://sage.sagedev.org/home/release/ and mirror
@@ -306,4 +306,4 @@ class ReleaseApplication(Application):
             check_tarball(tarball)
             stable = self.repo.previous_stable_version()
             check_upgrade(self.git, stable, version)
-        
+

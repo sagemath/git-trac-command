@@ -67,7 +67,7 @@ def TicketChange(changelog_entry):
 
 
 class TicketChange_class(object):
-    
+
     def __init__(self, time, author, change, data=None):
         self._time = make_time(time)
         self._author = author
@@ -94,7 +94,7 @@ class TicketChange_class(object):
     @property
     def author(self):
         return self._author
-        
+
     @property
     def change(self):
         return self._change
@@ -162,7 +162,7 @@ def TracTicket(ticket_number, server_proxy):
 
 
 class TracTicket_class(object):
-    
+
     def __init__(self, number, ctime, mtime, data, change_log=None):
         self._number = number
         self._ctime = make_time(ctime)
@@ -176,7 +176,7 @@ class TracTicket_class(object):
     def timestamp(self):
         """
         Timestamp for XML-RPC calls
-        
+
         The timestamp is an integer that must be set in subsequent
         ticket.update() XMLRPC calls to trac.
         """
@@ -255,8 +255,8 @@ class TracTicket_class(object):
                     break
             yield tuple(c[1] for c in sorted(accumulator))
             if stop:
-                raise StopIteration
-        
+                break
+
     @property
     def author(self):
         return self._data.get('author', '<no author>')
