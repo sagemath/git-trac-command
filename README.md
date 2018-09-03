@@ -207,14 +207,17 @@ DOT_GIT/config file):
     Password: ******
 
 Instead of a username and password you may also configure authentication via
-a generated token by passing `--token=<token>` instead of `--user` and
-`--pass`:
+a generated token by passing `--token=<token>` instead of `--pass`:
 
-    $ git trac config --token=<token>
+    $ git trac config --user=<username> --token=<token>
 
 **This is required if you authenticate to Trac with your GitHub account, as
 you do not have a Trac password.**.  Logged in users can find their token
-under https://trac.sagmath.org/prefs/token
+under https://trac.sagmath.org/prefs/token .  Technically, token
+authentication does not require configuring a username.  However, explicitly
+providing your username to the configuration is still required for many
+features to work correctly.  If you log into Trac via GitHub, make sure this
+is your full username, including the `gh-` prefix.
 
 If both a token and a username/password are configured, the token-based
 authentication takes precedence.
