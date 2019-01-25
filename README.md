@@ -27,7 +27,7 @@ To permanently install the code from this repo, clone it and run
 
     $ git clone https://github.com/sagemath/git-trac-command.git
     $ cd git-trac-command
-    $ python setup.py install
+    $ python setup.py install --user
 
 Alternatively you can just symlink ``git-trac`` to anywhere in your path:
 
