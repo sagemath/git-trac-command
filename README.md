@@ -213,7 +213,7 @@ a generated token by passing `--token=<token>` instead of `--pass`:
 
 **This is required if you authenticate to Trac with your GitHub account, as
 you do not have a Trac password.**.  Logged in users can find their token
-under https://trac.sagmath.org/prefs/token .  Technically, token
+under https://trac.sagemath.org/prefs/token .  Technically, token
 authentication does not require configuring a username.  However, explicitly
 providing your username to the configuration is still required for many
 features to work correctly.  If you log into Trac via GitHub, make sure this
