@@ -21,7 +21,7 @@ AUTHORS:
 #*****************************************************************************
 
 
-import re, sys
+import re
 import doctest
 import collections
 

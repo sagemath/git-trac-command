@@ -26,8 +26,6 @@ EXAMPLES::
 
 import os
 
-from datetime import datetime
-
 try:
     # Python 3.3+
     from xmlrpc.client import ServerProxy
@@ -45,8 +43,8 @@ from .token_transport import TokenAuthenticatedTransport
 from .config import AuthenticationError
 from .logger import logger
 from .trac_ticket import TracTicket
-from .trac_error import TracAuthenticationError
 from .cached_property import cached_property
+
 
 class TracServer(object):
 
@@ -107,7 +105,6 @@ class TracServer(object):
     def get_ssh_fingerprints(self):
         import tempfile
         import subprocess
-        fingerprints = []
         try:
             fd, tmp = tempfile.mkstemp()
             os.close(fd)
@@ -202,4 +199,3 @@ class TracServer(object):
         if len(branch) == 0:
             raise ValueError('no such branch on a trac ticket')
         return branch[0][0]
-    

@@ -29,7 +29,7 @@ import textwrap
 
 from .cached_property import cached_property
 from .git_commit import GitCommit
-from .git_error import GitError, DetachedHeadException
+from .git_error import GitError
 from .git_interface import GitInterface
 from .people import RELEASE_MANAGER
 from .logger import logger
@@ -131,7 +131,6 @@ class GitRepository(object):
             print('Local branch already exists. Use "git trac pull" to get updates.')
             self.git.checkout(local)
             return
-        remote_ref = 'remotes/trac/' + remote
         logger.debug('downloading branch %s', remote)
         self.git.fetch('trac', remote)
         self.git.branch(local, 'FETCH_HEAD')

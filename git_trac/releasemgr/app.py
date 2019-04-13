@@ -50,7 +50,7 @@ class ReleaseApplication(Application):
             except ValueError:
                 raise ValueError('invalid dependency: {0}'.format(dep))
             try:
-                commit = self.repo.find_release_merge_of_ticket(dep_number)
+                self.repo.find_release_merge_of_ticket(dep_number)
             except ValueError:
                 return False
             # commit is merged, good
@@ -197,7 +197,7 @@ class ReleaseApplication(Application):
                 self.close_ticket(ticket_commit, ticket)
 
     def publish(self):
-        tag = self.repo.head_version()
+        self.repo.head_version()
         self.git.push('--tags', 'trac', 'develop')
 
     def unmerge(self, ticket_number):

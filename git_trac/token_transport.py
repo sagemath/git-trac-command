@@ -4,11 +4,6 @@ request.
 """
 
 try:
-    import urllib2 as urllib
-except ImportError:
-    import urllib.request as urllib
-
-try:
     from xmlrpclib import SafeTransport, Fault
 except ImportError:
     from xmlrpc.client import SafeTransport, Fault
