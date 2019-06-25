@@ -20,10 +20,8 @@ Container for Configuration Data
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-
-
 import os
-import sys
+
 
 from .git_error import GitError
 

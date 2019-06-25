@@ -21,9 +21,6 @@ Handle Command Line Options
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-
-import sys
-import os
 import importlib
 
 from ..logger import logger

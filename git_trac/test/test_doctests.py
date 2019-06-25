@@ -24,7 +24,6 @@ Run doctests as part of the unittests
 import doctest
 import sys
 import os 
-import logging
 import re
 
 try:
@@ -40,7 +39,6 @@ except ImportError:
 
 from git_trac.test.doctest_parser import SageDocTestParser, SageOutputChecker
 from git_trac.test.builder import GitRepoBuilder
-from git_trac.logger import logger
 
 
 def sage_testmod(module, verbose=False, globs={}):

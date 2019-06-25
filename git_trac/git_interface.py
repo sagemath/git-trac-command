@@ -49,8 +49,7 @@ EXAMPLES::
 import os
 import subprocess
 
-from .cached_property import cached_property
-from .git_error import GitError, DetachedHeadException, UserEmailException
+from .git_error import GitError
 from .logger import logger
 
 

@@ -1,8 +1,6 @@
 """
 Fab file for interaction sagepad.org
 """
-import os
-
 try:
     import fabric
     from fabric.api import env, run, sudo, put, settings, cd, hosts
@@ -25,4 +23,3 @@ def rsync_upstream_packages():
     """
     with settings(**env_sagepad):
         run('rsync --archive --recursive rsync.sagemath.org::spkgs/upstream /var/www/sage-upstream')
-        

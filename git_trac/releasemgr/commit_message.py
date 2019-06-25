@@ -34,8 +34,6 @@ EXAMPLES::
     Ticket author(s): Ingólfur Eðvarðsson
     Reviewer(s): Reviewer
 """
-
-import re
 import textwrap
 
 

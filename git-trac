@@ -4,7 +4,6 @@
 # /dir/in/search/path/git-trac -> git-trac
 
 
-import os
 import sys
 
 try:
@@ -21,4 +20,3 @@ if __name__ == '__main__':
     except SystemExit as msg:
         if msg.code != 0:
             print('{0}\nExiting.'.format(msg))
-

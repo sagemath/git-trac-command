@@ -3,12 +3,9 @@
 # Easiest way to use this is to create a symlink
 # /dir/in/search/path/git-releasemgr -> git-releasemgr
 
-
-import os
 import sys
 
 try:
-    import git_trac
     from git_trac.releasemgr import cmdline
 except ImportError:
     sys.path.append('')
