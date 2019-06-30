@@ -34,7 +34,7 @@ GIT_TRAC_CMD="$GIT_TRAC_DIR/git-trac"
 
 if [ "$(command -v git-trac)" == "$GIT_TRAC_CMD" ]
 then
-    echo "The git-trac command is alread in your search PATH"
+    echo "The git-trac command is already in your search PATH"
 else
     echo "Prepending the git-trac command to your search PATH"
     export PATH="$GIT_TRAC_DIR":$PATH
