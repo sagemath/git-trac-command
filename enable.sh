@@ -7,19 +7,7 @@
 #     [user@localhost]$ source enable.sh
 #
 
-if [ -z $BASH_VERSION ]
-then
-    echo "This script only works if you use bash, aborting."
-    exit 1
-fi
-
-if [ ${BASH_VERSINFO[0]} -le 2 ]
-then
-    echo 'Your bash version is too old.'
-    exit 1
-fi
-
-if [ "${BASH_SOURCE[0]}" == "${0}" ]
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
     echo "You are trying to call this script directly, which is not"
     echo "possible. You must source this script instead:" 
@@ -29,13 +17,32 @@ then
     exit 1
 fi
 
-GIT_TRAC_DIR=`cd $(dirname -- $BASH_SOURCE)/bin && pwd -P`
-GIT_TRAC_CMD="$GIT_TRAC_DIR/git-trac"
+function set_path_git_trac {
+    GIT_TRAC_CMD="$GIT_TRAC_DIR/git-trac"
 
-if [ "$(command -v git-trac)" == "$GIT_TRAC_CMD" ]
-then
-    echo "The git-trac command is already in your search PATH"
+    if [[ "$(command -v git-trac)" == "$GIT_TRAC_CMD" ]]
+    then
+        echo "The git-trac command is already in your search PATH"
+    else
+        echo "Prepending the git-trac command to your search PATH"
+        export PATH="$GIT_TRAC_DIR":$PATH
+    fi
+}
+
+if [[ -n $BASH_VERSION ]]; then
+    # Assume bash
+    if [[ ${BASH_VERSINFO[0]} -le 2 ]]
+    then
+        echo 'Your bash version is too old.'
+    fi
+    GIT_TRAC_DIR=`cd $(dirname -- $BASH_SOURCE)/bin && pwd -P`
+    set_path_git_trac
+elif [[ -n $ZSH_VERSION ]]; then
+    # Assume zsh
+    GIT_TRAC_DIR=`cd $(dirname -- ${(%):-%x})/bin && pwd -P`
+    set_path_git_trac
 else
-    echo "Prepending the git-trac command to your search PATH"
-    export PATH="$GIT_TRAC_DIR":$PATH
-fi
+    echo "This script only works if you use bash or zsh, aborting."
+fi 
+
+unset set_path_git_trac
