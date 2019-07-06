@@ -8,6 +8,7 @@ setup(
     author='Volker Braun',
     author_email='vbraun.name@gmail.com',
     packages=['git_trac'],
+    data_files=[('share/git-trac-command', ['doc/git-cheat-sheet.pdf'])],
     scripts=['git-trac'],
     version='1.0',
     url='https://github.com/sagemath/git-trac-command',
