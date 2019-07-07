@@ -44,8 +44,27 @@ def xdg_open(uri):
 
 
 def show_cheat_sheet():
+    # case where `git-trac` was just symbolically linked
     root_dir = os.path.dirname(os.path.dirname(__file__))
     cheat_sheet = os.path.join(root_dir, 'doc', 'git-cheat-sheet.pdf')
+    # case of `python setup.py install --user`
+    if not os.path.exists(cheat_sheet):
+        root_dir = __import__('site').USER_BASE
+        cheat_sheet = os.path.join(root_dir,
+                                   'share',
+                                   'git-trac-command',
+                                   'git-cheat-sheet.pdf')
+    # case of `python setup.py install`
+    if not os.path.exists(cheat_sheet):
+        root_dir = sys.prefix
+        cheat_sheet = os.path.join(root_dir,
+                                   'share',
+                                   'git-trac-command',
+                                   'git-cheat-sheet.pdf')
+    # go to internet if not found
+    if not os.path.exists(cheat_sheet):
+        cheat_sheet = "http://github.com/sagemath/git-trac-command/raw/master/doc/git-cheat-sheet.pdf"
+        print('Cheat sheet not found locally. Trying the internet.')
     xdg_open(cheat_sheet)
 
 
