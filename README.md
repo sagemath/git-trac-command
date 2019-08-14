@@ -22,8 +22,6 @@ change is made:
     $ source git-trac-command/enable.sh
     Prepending the git-trac command to your search PATH
     
-**Note for `zsh` users:** `enable.sh` requires bash. Use one of the other options described below. 
-
 To permanently install the code from this repo, clone it and run
 ``setup.py``:
 
