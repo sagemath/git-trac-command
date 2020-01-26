@@ -17,7 +17,7 @@ AUTHORS:
 #  Distributed under the terms of the GNU General Public License (GPL)
 #  as published by the Free Software Foundation; either version 2 of
 #  the License, or (at your option) any later version.
-#                  http://www.gnu.org/licenses/
+#                  https://www.gnu.org/licenses/
 #*****************************************************************************
 
 
@@ -437,7 +437,7 @@ class SageDocTestParser(doctest.DocTestParser):
             else:
                 self.optional_only = True
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         """
         Comparison.
 
@@ -449,9 +449,12 @@ class SageDocTestParser(doctest.DocTestParser):
             sage: DTP == DTP2
             False
         """
-        c = cmp(type(self), type(other))
-        if c: return c
-        return cmp(self.__dict__, other.__dict__)
+        if type(self) != type(other):
+            return False
+        return (self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def parse(self, string, *args):
         r"""
