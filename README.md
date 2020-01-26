@@ -262,6 +262,6 @@ manager.
 Testing and Python Compatibility
 --------------------------------
 
-* The git-trac command supports Python 2.6, 2.7, 3.3, and 3.4.
+* The git-trac command supports Python 2.7, 3.3, 3.4 and 3.7.
 * Most recent [Travis CI](https://travis-ci.org/sagemath/git-trac-command) test:
   [![Build Status](https://travis-ci.org/sagemath/git-trac-command.svg?branch=master)](https://travis-ci.org/sagemath/git-trac-command)
