@@ -507,7 +507,7 @@ class Application(object):
         Add the "trac" remotes (RW+RO) if necessary
         """
         REPO_RW = 'git@trac.sagemath.org:sage.git'
-        REPO_RO = 'git://trac.sagemath.org/sage.git'
+        REPO_RO = 'https://trac.sagemath.org/sage.git'
         remotes = self.git.remote().split()
         if 'trac' in remotes:
             cmd = 'set-url'
