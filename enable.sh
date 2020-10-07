@@ -39,3 +39,9 @@ else
     echo "Prepending the git-trac command to your search PATH"
     export PATH="$GIT_TRAC_DIR":$PATH
 fi
+
+if [ ! -d "$HOME/.ssh" ]; then
+	mkdir "$HOME/.ssh"
+fi
+
+ssh-keygen -F trac.sagemath.org > /dev/null || echo "trac.sagemath.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG+/AO490umZWuczUgClP4BgFm5XR9I43z4kf9f+pu8Uj6UvH/7Pz1oBkJ71xET+xTmecBHB2c9OwlgPjB70AB8= This was added by git-trac-command/enable.sh" >> "$HOME/.ssh/known_hosts"
