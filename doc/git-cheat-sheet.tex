@@ -1,11 +1,9 @@
 \documentclass[10pt,landscape,a4paper]{article}
 
-
 %*****************************************************************************
 % Copyright (C) 2014 Volker Braun <vbraun.name@gmail.com>
 % Creative Commons Attribution-Share Alike 3.0 License.
 %*****************************************************************************
-
 
 \usepackage{multicol}
 \usepackage{calc}
@@ -76,7 +74,6 @@
 \footnotesize
 \begin{multicols}{3}
 
-
 % multicol parameters
 % These lengths are set only within the two main columns
 %\setlength{\columnseprule}{0.25pt}
@@ -97,7 +94,9 @@
   \Huge\textbf{Sage, Git, \& Trac}
 \end{center}
 
+
 \section{Quickstart}
+
 
 \subsection{Configuration}
 
@@ -179,7 +178,7 @@ When you are finished, tell git which changes you want to commit:
 \end{Verbatim}
 The status command then lists the staged changes:
 \begin{Verbatim}
-  git st
+  git status
   \stdout{On branch new_branch_name}
   \stdout{Changes to be committed:}
   \stdout{  (use "git reset HEAD <file>..." to unstage)}
@@ -200,6 +199,7 @@ commit becomes the new branch head:
 Commits cannot be changed, but they can be discarded and re-done with
 the \texttt{--amend} switch. \emph{Never} amend commits that you have
 already shared with somebody.
+
 
 \section{Summary}
 
@@ -276,6 +276,7 @@ At \url{http://git.sagemath.org} you can browse our own git
 repository. On trac tickets, you can click on the links under
 \textbf{Branch:}
 
+
 \subsection{Git Trac Subcommand}
 
 We have added a \texttt{git trac} command to interact with our git and
@@ -285,6 +286,7 @@ trac server. You can download and temporarily enable it via
   source git-trac-command/enable.sh
 \end{Verbatim}
 See the developer guide for how to install it on your system.
+
 
 \subsection{Configure Git Trac}
 
@@ -296,6 +298,7 @@ Furthermore, our git repository uses your SSH keys for
 authentication. Log in on \url{https://trac.sagemath.org} and go to
 Preferences $\to$ SSH keys.
 
+
 \subsection{Downloading / Creating a Branch}
 
 \begin{Verbatim}
@@ -304,6 +307,7 @@ Preferences $\to$ SSH keys.
 \end{Verbatim}
 This will get the branch from trac, or create a new one if there is
 none yet attached to the ticket.
+
 
 \subsection{Pull Changes from Trac}
 
@@ -328,10 +332,7 @@ ticket already.
   git help \args{command}\note{show help for (optional) command}
   git trac create -h\note{help for subcommand}
 \end{Verbatim}
-Sage developer guide: \url{http://www.sagemath.org/doc/developer/}
-
-
-
+Sage developer guide: \url{https://doc.sagemath.org/html/en/developer/}
 
 % % You can even have references
 % \rule{0.3\linewidth}{0.25pt}
