@@ -290,6 +290,15 @@ class ReleaseApplication(Application):
         print(u'Merge tickets with:')
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
+    def set_ticket_to_needs_work(self, ticket_number, comment):
+        attributes = {
+            'status': 'needs_work',
+        }
+        notify = True
+        print('#### {}: {}'.format(ticket_number, comment))
+        #return self.trac.authenticated_proxy.ticket.update(
+        #    ticket_number, comment, attributes, notify)
+
     def merge_all(self, limit=0, milestone=None):
         """
         Merge all tickets that are ready
@@ -312,6 +321,11 @@ class ReleaseApplication(Application):
                 successful.append(ticket_number)
             except ValueError as err:
                 errors.append((ticket_number, str(err)))
+                if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
+                    formatted_successful = ', '.join('#{}'.format(n) for n in successful)
+                    comment = 'Merge failure on top of tickets {}:\n\n{}'.format(
+                        formatted_successful, err)
+                    self.set_ticket_to_needs_work(ticket_number, comment)
             if limit and (len(successful) >= limit):
                 break
         if successful:
