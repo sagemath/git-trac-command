@@ -295,9 +295,12 @@ class ReleaseApplication(Application):
             'status': 'needs_work',
         }
         notify = True
-        print('#### {}: {}'.format(ticket_number, comment))
-        #return self.trac.authenticated_proxy.ticket.update(
-        #    ticket_number, comment, attributes, notify)
+        return self.trac.authenticated_proxy.ticket.update(
+            ticket_number, comment, attributes, notify)
+
+    def describe(self):
+        self.git.fetch('trac', 'develop')
+        return self.git.log('--oneline', '--first-parent', 'FETCH_HEAD~..HEAD')
 
     def merge_all(self, limit=0, milestone=None):
         """
@@ -322,9 +325,8 @@ class ReleaseApplication(Application):
             except ValueError as err:
                 errors.append((ticket_number, str(err)))
                 if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
-                    formatted_successful = ', '.join('#{}'.format(n) for n in successful)
-                    comment = 'Merge failure on top of tickets {}:\n\n{}'.format(
-                        formatted_successful, err)
+                    comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
+                        self.describe().replace('\n', '\n\n'), err)
                     self.set_ticket_to_needs_work(ticket_number, comment)
             if limit and (len(successful) >= limit):
                 break
