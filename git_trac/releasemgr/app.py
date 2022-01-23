@@ -230,21 +230,25 @@ class ReleaseApplication(Application):
         self.git.rebase('--verbose', '--rebase-merges',
                         commit.sha1, '--onto', first_parent.sha1)
 
-    def _get_ready_tickets(self):
-        querystr = '&'.join([
-            'status=positive_review',
-            'milestone!=sage-duplicate/invalid/wontfix',
-        'milestone!=sage-feature',
-        'milestone!=sage-pending',
-        'milestone!=sage-wishlist',
-        ])
+    def _get_ready_tickets(self, milestone=None):
+        params = ['status=positive_review']
+        if milestone:
+            if not milestone.startswith('sage-'):
+                milestone = 'sage-' + milestone
+            params.append('milestone={0}'.format(milestone))
+        else:
+            params.extend(['milestone!=sage-duplicate/invalid/wontfix',
+                           'milestone!=sage-feature',
+                           'milestone!=sage-pending',
+                           'milestone!=sage-wishlist'])
+        querystr = '&'.join(params)
         return self.trac.anonymous_proxy.ticket.query(querystr)
 
-    def todo(self):
+    def todo(self, milestone=None):
         """
         Print a list of tickets that are ready to be merged
         """
-        tickets = self._get_ready_tickets()
+        tickets = self._get_ready_tickets(milestone=milestone)
         if not tickets:
             print(u'No tickets are ready to be merged')
             return
@@ -255,11 +259,11 @@ class ReleaseApplication(Application):
         print(u'Merge tickets with:')
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
-    def merge_all(self, limit=0):
+    def merge_all(self, limit=0, milestone=None):
         """
         Merge all tickets that are ready
         """
-        tickets = self._get_ready_tickets()
+        tickets = self._get_ready_tickets(milestone=milestone)
         if not tickets:
             print('No tickets are ready to be merged')
             return
