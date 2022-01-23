@@ -1,6 +1,11 @@
+
+# -*- coding: utf-8 -*-
 """
 Fab file for interaction with the sagemath.org server
 """
+
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 import os
 
 try:
@@ -57,6 +62,18 @@ def upload_dist_tarball(tarball, devel=True):
         basename = os.path.basename(tarball)
         put(tarball, os.path.join(destination, basename))
         run('/home/files/publish-files.sh')
+
+
+def upload_temp_confball(confball):
+    """
+    Add temporary tarball to ​http://old.files.sagemath.org/configure/
+
+    These are for testing only and not send out to the mirror network
+    """
+    destination = '/home/files/files-old/configure'
+    with settings(**env_sagemath):
+        basename = os.path.basename(confball)
+        put(confball, os.path.join(destination, basename))
 
 
 

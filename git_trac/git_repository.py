@@ -255,6 +255,9 @@ class GitRepository(object):
         log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent',
                            'HEAD', author=RELEASE_MANAGER)
         for line in log.splitlines():
+            if 'Updated SageMath version' in line:
+                logger.debug('ignoring version bump: ' + line)
+                continue
             match = SPLIT_RELEASE_LOG_RE.match(line.strip())
             if match is None:
                 raise ValueError('parsing log failed at "{0}"'.format(line))

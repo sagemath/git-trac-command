@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
 """
 Fab file for interaction sagepad.org
 """
+
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
+import os
+
 try:
     import fabric
     from fabric.api import env, run, sudo, put, settings, cd, hosts
@@ -23,3 +29,15 @@ def rsync_upstream_packages():
     """
     with settings(**env_sagepad):
         run('rsync --archive --recursive rsync.sagemath.org::spkgs/upstream /var/www/sage-upstream')
+
+
+def upload_temp_confball(confball):
+    """
+    Add temporary tarball to ​http://sagepad.org/spkg/
+
+    These are for testing only and not send out to the mirror network
+    """
+    destination = '/var/www/sage-upstream/upstream/configure'
+    with settings(**env_sagepad):
+        basename = os.path.basename(confball)
+        put(confball, os.path.join(destination, basename))

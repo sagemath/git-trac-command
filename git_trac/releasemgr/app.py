@@ -1,16 +1,27 @@
+# -*- coding: utf-8 -*-
 """
 The Release Management App
 """
 
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 import os
 import re
 import tempfile
+import logging
+import fabric.tasks
 
 from ..app import Application
 
 from ..people import RELEASE_MANAGER
+from git_trac.logger import logger as log
 
 from git_trac.releasemgr.version_string import VersionString
+from git_trac.releasemgr.bootstrap import run_bootstrap
+from git_trac.releasemgr.fileserver_sagemath_org import \
+    upload_temp_confball as upload_temp_confball_fileserver
+from git_trac.releasemgr.sagepad_org import \
+    upload_temp_confball as upload_temp_confball_sagepad
 
 
 class ReleaseApplication(Application):
@@ -50,8 +61,9 @@ class ReleaseApplication(Application):
             except ValueError:
                 raise ValueError('invalid dependency: {0}'.format(dep))
             try:
-                self.repo.find_release_merge_of_ticket(dep_number)
-            except ValueError:
+                commit = self.repo.find_release_merge_of_ticket(dep_number)
+            except ValueError as error:
+                log.debug('ticket not merged: {} ({})'.format(dep_number, error))
                 return False
             # commit is merged, good
         return True
@@ -215,7 +227,7 @@ class ReleaseApplication(Application):
         print(u'Removing {0}'.format(commit.get_message('short')))
         print(u'Parent release commit is {0}'.format(first_parent))
         # git rebase --verbose --preserve-merges shatoremove --onto shaoffirstparent
-        self.git.rebase('--verbose', '--preserve-merges',
+        self.git.rebase('--verbose', '--rebase-merges',
                         commit.sha1, '--onto', first_parent.sha1)
 
     def _get_ready_tickets(self):
@@ -243,7 +255,7 @@ class ReleaseApplication(Application):
         print(u'Merge tickets with:')
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
-    def merge_all(self, limit=10):
+    def merge_all(self, limit=0):
         """
         Merge all tickets that are ready
         """
@@ -259,6 +271,8 @@ class ReleaseApplication(Application):
                 successful.append(ticket_number)
             except ValueError as err:
                 errors.append((ticket_number, str(err)))
+            if limit and (len(successful) >= limit):
+                break
         if successful:
             print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
         for ticket_number, error_message in errors:
@@ -309,3 +323,18 @@ class ReleaseApplication(Application):
             stable = self.repo.previous_stable_version()
             check_upgrade(self.git, stable, version)
 
+    def confball(self):
+        """
+        Create and upload new confball
+
+        This is a tarball containing the configure script, that is, the autotools output. So you can
+        build sage without autotools.
+        """
+        sha1 = self.repo.head.sha1
+        confball = run_bootstrap(sha1)
+        print('New confball is {}'.format(confball))
+        fabric.tasks.execute(upload_temp_confball_fileserver, confball)
+        fabric.tasks.execute(upload_temp_confball_sagepad, confball)
+        print('Adding the confball to the current commit...')
+        self.git.echo.add('build/pkgs/configure/')
+        self.git.echo.commit('--amend', '--no-edit')

@@ -82,6 +82,11 @@ def launch():
 
     # git releasemgr merge-all
     parser_merge_all = subparsers.add_parser('merge-all', help='Merge all tickets that are ready')
+    parser_merge_all.add_argument('--limit', dest='limit', type=int,
+                                  help='Merge this many tickets', default=0)
+
+    # git releasemgr print
+    parser_confball = subparsers.add_parser('confball', help='Create new confball')
 
     # git releasemgr test
     parser_test = subparsers.add_parser('test', help='Test merge unreview ticket')
@@ -152,7 +157,9 @@ def launch():
     elif args.subcommand == 'todo':
         app.todo()
     elif args.subcommand == 'merge-all':
-        app.merge_all()
+        app.merge_all(args.limit)
+    elif args.subcommand == 'confball':
+        app.confball()
     elif args.subcommand == 'upstream':
         app.upstream(args.url)
     elif args.subcommand == 'dist':
