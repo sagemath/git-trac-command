@@ -15,7 +15,7 @@ from ..app import Application
 
 from ..people import RELEASE_MANAGER
 from git_trac.logger import logger as log
-
+from git_trac.git_error import GitError
 from git_trac.releasemgr.version_string import VersionString
 from git_trac.releasemgr.bootstrap import run_bootstrap
 from git_trac.releasemgr.fileserver_sagemath_org import \
@@ -131,7 +131,11 @@ class ReleaseApplication(Application):
         self.git.echo.fetch('trac', branch)
 
         print('Merging ticket...')
-        self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
+        try:
+            self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
+        except GitError:
+            # Merge conflicts are recognized below
+            pass
 
         status = self.git.status()
         if 'nothing to commit' in status:
