@@ -185,9 +185,33 @@ class ReleaseApplication(Application):
                 raise ValueError('merge was not clean')
             self._commit(commit_message)
 
-    def merge_multiple(self, ticket_numbers, **kwds):
-        for ticket_number in ticket_numbers:
-            self.merge(ticket_number, **kwds)
+    def merge_multiple(self, ticket_numbers, limit=0, **kwds):
+        successful = []
+        errors = []
+        try:
+            for ticket_number in ticket_numbers:
+                try:
+                    self.merge(ticket_number)
+                    successful.append(ticket_number)
+                except ValueError as err:
+                    errors.append((ticket_number, str(err)))
+                    if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
+                        comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
+                            self.describe().replace('\n', '\n\n'), err)
+                        self.set_ticket_to_needs_work(ticket_number, comment)
+                if limit and (len(successful) >= limit):
+                    break
+        finally:
+            print("\n### Summary ###\n")
+            if len(ticket_numbers) != 1:
+                if successful:
+                    print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
+                for ticket_number, error_message in errors:
+                    t = self.trac.load(ticket_number)
+                    print(u'')
+                    print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+                    print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
+                    print(u'  Error: ' + error_message)
 
     def close_ticket(self, commit, ticket):
         if ticket.commit != commit.sha1:
@@ -319,28 +343,7 @@ class ReleaseApplication(Application):
             print(u'No tickets {}are ready to be merged'.format(milestone_str))
             return
         print(u'Merging tickets {}'.format(milestone_str))
-        successful = []
-        errors = []
-        for ticket_number in tickets:
-            try:
-                self.merge(ticket_number)
-                successful.append(ticket_number)
-            except ValueError as err:
-                errors.append((ticket_number, str(err)))
-                if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
-                    comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
-                        self.describe().replace('\n', '\n\n'), err)
-                    self.set_ticket_to_needs_work(ticket_number, comment)
-            if limit and (len(successful) >= limit):
-                break
-        if successful:
-            print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
-        for ticket_number, error_message in errors:
-            t = self.trac.load(ticket_number)
-            print(u'')
-            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-            print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
-            print(u'  Error: ' + error_message)
+        return self.merge_multiple(tickets, limit=limit)
 
     def upstream(self, url):
         """
