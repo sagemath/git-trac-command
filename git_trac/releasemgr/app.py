@@ -17,6 +17,7 @@ from ..people import RELEASE_MANAGER
 from git_trac.logger import logger as log
 from git_trac.git_error import GitError
 from git_trac.releasemgr.version_string import VersionString
+from git_trac.releasemgr.patchbot import patchbot_status
 from git_trac.releasemgr.bootstrap import run_bootstrap
 from git_trac.releasemgr.fileserver_sagemath_org import \
     upload_temp_confball as upload_temp_confball_fileserver
@@ -264,7 +265,7 @@ class ReleaseApplication(Application):
             return 'sage-' + milestone
         return milestone
 
-    def _get_ready_tickets(self, milestone=None):
+    def _get_ready_tickets(self, milestone=None, patchbot_statuses=None):
         params = ['status=positive_review']
         milestone = self._normalize_milestone(milestone)
         if milestone:
@@ -275,14 +276,19 @@ class ReleaseApplication(Application):
                            'milestone!=sage-pending',
                            'milestone!=sage-wishlist'])
         querystr = '&'.join(params)
-        return self.trac.anonymous_proxy.ticket.query(querystr)
+        ticket_numbers = self.trac.anonymous_proxy.ticket.query(querystr)
+        if not patchbot_statuses:
+            return ticket_numbers
+        return [ticket_number
+                for ticket_number in ticket_numbers
+                if patchbot_status(ticket_number) in patchbot_statuses]
 
-    def todo(self, milestone=None):
+    def todo(self, milestone=None, patchbot_statuses=None):
         """
         Print a list of tickets that are ready to be merged
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone)
+        tickets = self._get_ready_tickets(milestone=milestone, patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
@@ -311,12 +317,12 @@ class ReleaseApplication(Application):
         self.git.fetch('trac', 'develop')
         return self.git.log('--oneline', '--first-parent', 'FETCH_HEAD~..HEAD')
 
-    def merge_all(self, limit=0, milestone=None):
+    def merge_all(self, limit=0, milestone=None, patchbot_statuses=None):
         """
         Merge all tickets that are ready
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone)
+        tickets = self._get_ready_tickets(milestone=milestone, patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
