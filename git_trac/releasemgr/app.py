@@ -230,11 +230,33 @@ class ReleaseApplication(Application):
         self.git.rebase('--verbose', '--rebase-merges',
                         commit.sha1, '--onto', first_parent.sha1)
 
+    def _current_milestone(self):
+        # The current milestone does not appear to be available via
+        # XML-RPC.  We just infer it from the tags to the extent possible.
+        version = self.repo.current_version()
+        m = re.match('^(([0-9]+)[.]([0-9]+)([.]([0-9])+)?)([.](b|beta|rc))?', version)
+        if m.group(6):
+            # development version
+            return 'sage-{}'.format(m.group(1))
+        if m.group(5):
+            # released version x.y.z
+            return 'sage-{}.{}.{}'.format(m.group(2), m.group(3), int(m.group(5)) + 1)
+        # released version x.y
+        return 'sage-{}.{}'.format(m.group(2), int(m.group(3)) + 1)
+
+    def _normalize_milestone(self, milestone):
+        if milestone is None:
+            return milestone
+        if milestone == 'current':
+            return self._current_milestone()
+        if not milestone.startswith('sage-'):
+            return 'sage-' + milestone
+        return milestone
+
     def _get_ready_tickets(self, milestone=None):
         params = ['status=positive_review']
+        milestone = self._normalize_milestone(milestone)
         if milestone:
-            if not milestone.startswith('sage-'):
-                milestone = 'sage-' + milestone
             params.append('milestone={0}'.format(milestone))
         else:
             params.extend(['milestone!=sage-duplicate/invalid/wontfix',
@@ -248,11 +270,16 @@ class ReleaseApplication(Application):
         """
         Print a list of tickets that are ready to be merged
         """
+        milestone = self._normalize_milestone(milestone)
         tickets = self._get_ready_tickets(milestone=milestone)
+        if milestone:
+            milestone_str = 'for milestone {} '.format(milestone)
+        else:
+            milestone_str = ''
         if not tickets:
-            print(u'No tickets are ready to be merged')
+            print(u'No tickets {}are ready to be merged'.format(milestone_str))
             return
-        print(u'The following tickets are ready to be merged')
+        print(u'The following tickets {}are ready to be merged'.format(milestone_str))
         for ticket_number in tickets:
             t = self.trac.load(ticket_number)
             print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
@@ -263,10 +290,16 @@ class ReleaseApplication(Application):
         """
         Merge all tickets that are ready
         """
+        milestone = self._normalize_milestone(milestone)
         tickets = self._get_ready_tickets(milestone=milestone)
+        if milestone:
+            milestone_str = 'for milestone {} '.format(milestone)
+        else:
+            milestone_str = ''
         if not tickets:
-            print('No tickets are ready to be merged')
+            print(u'No tickets {}are ready to be merged'.format(milestone_str))
             return
+        print(u'Merging tickets {}'.format(milestone_str))
         successful = []
         errors = []
         for ticket_number in tickets:

@@ -86,7 +86,8 @@ def launch():
                                   help='Merge this many tickets', default=0)
     milestone_help = ('Merge only tickets in this milestone '
                       '(default: any milestone other than sage-duplicate/invalid/wontfix, '
-                      'sage-feature, sage-pending, sage-wishlist)')
+                      'sage-feature, sage-pending, sage-wishlist); '
+                      'use "current" for best guess of current milestone')
     parser_merge_all.add_argument('--milestone', dest='milestone',
                                   help=milestone_help, default=None)
 
