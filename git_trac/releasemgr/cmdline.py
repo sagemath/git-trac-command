@@ -84,6 +84,12 @@ def launch():
     parser_merge_all = subparsers.add_parser('merge-all', help='Merge all tickets that are ready')
     parser_merge_all.add_argument('--limit', dest='limit', type=int,
                                   help='Merge this many tickets', default=0)
+    milestone_help = ('Merge only tickets in this milestone '
+                      '(default: any milestone other than sage-duplicate/invalid/wontfix, '
+                      'sage-feature, sage-pending, sage-wishlist); '
+                      'use "current" for best guess of current milestone')
+    parser_merge_all.add_argument('--milestone', dest='milestone',
+                                  help=milestone_help, default=None)
 
     # git releasemgr print
     parser_confball = subparsers.add_parser('confball', help='Create new confball')
@@ -105,6 +111,8 @@ def launch():
 
     # git releasemgr todo
     parser_todo = subparsers.add_parser('todo', help='Print list of tickets ready to merge')
+    parser_todo.add_argument('--milestone', dest='milestone',
+                             help=milestone_help, default=None)
 
     # git releasemgr upstream <url>
     parser_upstream = subparsers.add_parser('upstream', help='Upload upstream tarball')
@@ -155,9 +163,9 @@ def launch():
     elif args.subcommand == 'publish':
         app.publish()
     elif args.subcommand == 'todo':
-        app.todo()
+        app.todo(milestone=args.milestone)
     elif args.subcommand == 'merge-all':
-        app.merge_all(args.limit)
+        app.merge_all(args.limit, milestone=args.milestone)
     elif args.subcommand == 'confball':
         app.confball()
     elif args.subcommand == 'upstream':
