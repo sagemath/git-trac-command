@@ -299,7 +299,9 @@ class ReleaseApplication(Application):
         print(u'The following tickets {}are ready to be merged'.format(milestone_str))
         for ticket_number in tickets:
             t = self.trac.load(ticket_number)
-            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+            s = patchbot_status(ticket_number)
+            print(u'* {ticket.number} {ticket.title} ({ticket.author}) 🤖{patchbot_status}'.format(
+                ticket=t, patchbot_status=s))
         print(u'Merge tickets with:')
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
