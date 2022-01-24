@@ -43,7 +43,7 @@ class ReleaseApplication(Application):
         try:
             fd, tmp = tempfile.mkstemp()
             os.close(fd)
-            with open(tmp, 'w') as f:
+            with open(tmp, 'wb') as f:
                 f.write(commit_message.encode('utf-8'))
             self.git.echo.commit(file=tmp, author=RELEASE_MANAGER, **kwds)
         finally:
