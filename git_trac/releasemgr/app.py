@@ -133,7 +133,8 @@ class ReleaseApplication(Application):
         print('Merging ticket...')
         try:
             self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
-        except GitError:
+        except GitError as err:
+            print(err)
             # Merge conflicts are recognized below
             pass
 
