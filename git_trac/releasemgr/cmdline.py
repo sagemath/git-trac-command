@@ -59,6 +59,9 @@ def launch():
                         help='debug')
     parser.add_argument('--log', dest='log', default=None,
                         help='one of [DEBUG, INFO, ERROR, WARNING, CRITICAL]')
+    parser.add_argument('--trac-context', dest='trac_context', type=str, default='',
+                        help='Text to add to comments on Trac tickets')
+
     subparsers = parser.add_subparsers(dest='subcommand')
 
     # git releasemgr print
@@ -143,7 +146,7 @@ def launch():
         return parser.print_help()
 
     from .app import ReleaseApplication
-    app = ReleaseApplication()
+    app = ReleaseApplication(trac_context=args.trac_context)
 
     if args.debug:
         debug_shell(app)

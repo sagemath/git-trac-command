@@ -26,6 +26,10 @@ from git_trac.releasemgr.sagepad_org import \
 
 class ReleaseApplication(Application):
 
+    def __init__(self, trac_context=''):
+        Application.__init__(self)
+        self._trac_context = trac_context
+
     def print_ticket(self, ticket_number):
         """
         INPUT:
@@ -193,7 +197,7 @@ class ReleaseApplication(Application):
         if ticket.commit != commit.sha1:
             raise RuntimeError('ticket #{0} branch changed (merged={1}, current={2})'
                                .format(ticket.number, commit.sha1, ticket.commit))
-        comment = ''
+        comment = self._trac_context
         attributes = {
             '_ts': ticket.timestamp,
             'status': 'closed',
@@ -294,6 +298,8 @@ class ReleaseApplication(Application):
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
     def set_ticket_to_needs_work(self, ticket_number, comment):
+        if self._trac_context:
+            comment += '\n\n' + self._trac_context
         attributes = {
             'status': 'needs_work',
         }
