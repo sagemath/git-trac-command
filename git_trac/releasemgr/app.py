@@ -138,6 +138,7 @@ class ReleaseApplication(Application):
             pass
 
         status = self.git.status()
+        print(status)
         if 'nothing to commit' in status:
             if not allow_empty:
                 raise ValueError('already merged')
