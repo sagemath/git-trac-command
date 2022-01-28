@@ -139,7 +139,7 @@ class ReleaseApplication(Application):
 
         status = self.git.status()
         print(status)
-        if 'nothing to commit' in status:
+        if 'nothing to commit' in status or 'nothing added to commit' in status:
             if not allow_empty:
                 raise ValueError('already merged')
             print('This is an empty commit')
@@ -177,7 +177,7 @@ class ReleaseApplication(Application):
 
         commit_message = u'TEST Trac #{ticket.number}: {ticket.title}'.format(ticket=ticket)
         status = self.git.status()
-        if 'nothing to commit' in status:
+        if 'nothing to commit' in status or 'nothing added to commit' in status:
             raise ValueError('already merged')
         else:
             if 'All conflicts fixed but you are still merging.' not in status:
