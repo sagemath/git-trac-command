@@ -368,7 +368,9 @@ class GitRepository(object):
 
     def _tag_iter(self, skip=0):
         """
-        Iterate over the tags in reverse chronological order from the current head.
+        Iterate over the release tags in reverse chronological order from the current head.
+
+        Ignores tags that are not release tags.
         """
         log = self.git.log('--oneline', '--no-abbrev-commit', '--first-parent', 'HEAD')
         for line in log.splitlines():
@@ -376,11 +378,13 @@ class GitRepository(object):
                 skip -= 1
                 continue
             sha1 = line[0:40]
-            tag = self.git.tag('-l', '--points-at', sha1).splitlines()
+            tag = [t
+                   for t in self.git.tag('-l', '--points-at', sha1).splitlines()
+                   if re.match('^(([0-9]+)[.]([0-9]+)([.]([0-9])+)?)([.](b|beta|rc))?$', t)]
             if len(tag) == 0:
                 continue
             if len(tag) > 1:
-                raise ValueError('multiple tags for commit ' + sha1)
+                raise ValueError('multiple release tags for commit ' + sha1)
             yield tag[0]
         raise ValueError('did not find a tagged version')
 
