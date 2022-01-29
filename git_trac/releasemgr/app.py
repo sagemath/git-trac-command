@@ -233,16 +233,18 @@ class ReleaseApplication(Application):
     def _current_milestone(self):
         # The current milestone does not appear to be available via
         # XML-RPC.  We just infer it from the tags to the extent possible.
-        version = self.repo.current_version()
-        m = re.match('^(([0-9]+)[.]([0-9]+)([.]([0-9])+)?)([.](b|beta|rc))?', version)
-        if m.group(6):
-            # development version
-            return 'sage-{}'.format(m.group(1))
-        if m.group(5):
-            # released version x.y.z
-            return 'sage-{}.{}.{}'.format(m.group(2), m.group(3), int(m.group(5)) + 1)
-        # released version x.y
-        return 'sage-{}.{}'.format(m.group(2), int(m.group(3)) + 1)
+        for version in self.repo._tag_iter():
+            m = re.match('^(([0-9]+)[.]([0-9]+)([.]([0-9])+)?)([.](b|beta|rc))?', version)
+            if m:
+                if m.group(6):
+                    # development version
+                    return 'sage-{}'.format(m.group(1))
+                if m.group(5):
+                    # released version x.y.z
+                    return 'sage-{}.{}.{}'.format(m.group(2), m.group(3), int(m.group(5)) + 1)
+                # released version x.y
+                return 'sage-{}.{}'.format(m.group(2), int(m.group(3)) + 1)
+        raise ValueError('current milestone cannot be determined - no release tags')
 
     def _normalize_milestone(self, milestone):
         if milestone is None:
