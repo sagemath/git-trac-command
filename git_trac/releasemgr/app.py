@@ -15,7 +15,7 @@ from ..app import Application
 
 from ..people import RELEASE_MANAGER
 from git_trac.logger import logger as log
-
+from git_trac.git_error import GitError
 from git_trac.releasemgr.version_string import VersionString
 from git_trac.releasemgr.bootstrap import run_bootstrap
 from git_trac.releasemgr.fileserver_sagemath_org import \
@@ -131,10 +131,15 @@ class ReleaseApplication(Application):
         self.git.echo.fetch('trac', branch)
 
         print('Merging ticket...')
-        self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
+        try:
+            self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
+        except GitError:
+            # Merge conflicts are recognized below
+            pass
 
         status = self.git.status()
-        if 'nothing to commit' in status:
+        print(status)
+        if 'nothing to commit' in status or 'nothing added to commit' in status:
             if not allow_empty:
                 raise ValueError('already merged')
             print('This is an empty commit')
@@ -172,7 +177,7 @@ class ReleaseApplication(Application):
 
         commit_message = u'TEST Trac #{ticket.number}: {ticket.title}'.format(ticket=ticket)
         status = self.git.status()
-        if 'nothing to commit' in status:
+        if 'nothing to commit' in status or 'nothing added to commit' in status:
             raise ValueError('already merged')
         else:
             if 'All conflicts fixed but you are still merging.' not in status:
@@ -288,6 +293,18 @@ class ReleaseApplication(Application):
         print(u'Merge tickets with:')
         print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
+    def set_ticket_to_needs_work(self, ticket_number, comment):
+        attributes = {
+            'status': 'needs_work',
+        }
+        notify = True
+        return self.trac.authenticated_proxy.ticket.update(
+            ticket_number, comment, attributes, notify)
+
+    def describe(self):
+        self.git.fetch('trac', 'develop')
+        return self.git.log('--oneline', '--first-parent', 'FETCH_HEAD~..HEAD')
+
     def merge_all(self, limit=0, milestone=None):
         """
         Merge all tickets that are ready
@@ -310,6 +327,10 @@ class ReleaseApplication(Application):
                 successful.append(ticket_number)
             except ValueError as err:
                 errors.append((ticket_number, str(err)))
+                if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
+                    comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
+                        self.describe().replace('\n', '\n\n'), err)
+                    self.set_ticket_to_needs_work(ticket_number, comment)
             if limit and (len(successful) >= limit):
                 break
         if successful:

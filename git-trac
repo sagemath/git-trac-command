@@ -17,6 +17,7 @@ if __name__ == '__main__':
         cmdline.launch()
     except ValueError as error:
         print('Error: {0}'.format(error))
+        sys.exit(1)
     except SystemExit as msg:
         if msg.code != 0:
             print('{0}\nExiting.'.format(msg))
