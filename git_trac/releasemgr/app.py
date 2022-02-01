@@ -290,8 +290,11 @@ class ReleaseApplication(Application):
             return 'sage-' + milestone
         return milestone
 
-    def _get_ready_tickets(self, milestone=None, patchbot_statuses=None):
-        params = ['status=positive_review']
+    def _get_ready_tickets(self, milestone=None, statuses=None, patchbot_statuses=None):
+        if statuses is None:
+            statuses = ['positive_review']
+        params = ['status={}'.format(status)
+                  for status in statuses]
         milestone = self._normalize_milestone(milestone)
         if milestone:
             params.append('milestone={0}'.format(milestone))
@@ -308,12 +311,13 @@ class ReleaseApplication(Application):
                 for ticket_number in ticket_numbers
                 if patchbot_status(ticket_number) in patchbot_statuses]
 
-    def todo(self, milestone=None, patchbot_statuses=None):
+    def todo(self, milestone=None, statuses=None, patchbot_statuses=None):
         """
         Print a list of tickets that are ready to be merged
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone, patchbot_statuses=patchbot_statuses)
+        tickets = self._get_ready_tickets(milestone=milestone,
+                                          statuses=statuses, patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
@@ -344,12 +348,13 @@ class ReleaseApplication(Application):
         self.git.fetch('trac', 'develop')
         return self.git.log('--oneline', '--first-parent', 'FETCH_HEAD~..HEAD')
 
-    def merge_all(self, limit=0, milestone=None, patchbot_statuses=None):
+    def merge_all(self, limit=0, milestone=None, statuses=None, patchbot_statuses=None):
         """
         Merge all tickets that are ready
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone, patchbot_statuses=patchbot_statuses)
+        tickets = self._get_ready_tickets(milestone=milestone, statuses=statuses,
+                                          patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:

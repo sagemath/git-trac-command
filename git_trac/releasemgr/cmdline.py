@@ -94,6 +94,10 @@ def launch():
                           'use "current" for best guess of current milestone')
         parser.add_argument('--milestone', dest='milestone',
                             help=milestone_help, default=None)
+        status_help = ('Only tickets with this status '
+                       '(default: positive_review)')
+        parser.add_argument('--status', type=str, nargs='*',
+                            help=status_help)
         patchbot_status_help = ('Only tickets with this patchbot status '
                                 '(TestsPassed, TestsPassedOnRetry, PluginOnlyFailed, Pending, ...) '
                                 '(default: any status)')
@@ -105,7 +109,7 @@ def launch():
     parser_confball = subparsers.add_parser('confball', help='Create new confball')
 
     # git releasemgr test
-    parser_test = subparsers.add_parser('test', help='Test merge unreview ticket')
+    parser_test = subparsers.add_parser('test', help='Test merge unreviewed ticket')
     parser_test.add_argument('ticket', type=int, help='Ticket number')
 
     # git releasemgr unmerge
@@ -172,9 +176,9 @@ def launch():
     elif args.subcommand == 'publish':
         app.publish()
     elif args.subcommand == 'todo':
-        app.todo(milestone=args.milestone, patchbot_statuses=args.patchbot_status)
+        app.todo(milestone=args.milestone, statuses=args.status, patchbot_statuses=args.patchbot_status)
     elif args.subcommand == 'merge-all':
-        app.merge_all(args.limit, milestone=args.milestone, patchbot_statuses=args.patchbot_status)
+        app.merge_all(args.limit, milestone=args.milestone, statuses=args.status, patchbot_statuses=args.patchbot_status)
     elif args.subcommand == 'confball':
         app.confball()
     elif args.subcommand == 'upstream':
