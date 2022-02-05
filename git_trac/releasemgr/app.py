@@ -122,10 +122,10 @@ class ReleaseApplication(Application):
 
         import string
         if not ignore_name:
-            if not all(author[0].strip() in string.ascii_uppercase
+            if not all(author and author[0].strip() in string.ascii_uppercase
                        for author in ticket.author.split(',')):
                 raise ValueError(u'author {0} does not look right'.format(repr(ticket.author)))
-            if not all(reviewer[0].strip() in string.ascii_uppercase
+            if not all(reviewer and reviewer[0].strip() in string.ascii_uppercase
                        for reviewer in ticket.reviewer.split(',')):
                 raise ValueError(u'reviewer {0} does not look right'.format(repr(ticket.reviewer)))
 
