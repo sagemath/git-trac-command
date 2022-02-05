@@ -209,15 +209,14 @@ class ReleaseApplication(Application):
                     break
         finally:
             print("\n### Summary ###\n")
-            if len(ticket_numbers) != 1:
-                if successful:
-                    print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
-                for ticket_number, error_message in errors:
-                    t = self.trac.load(ticket_number)
-                    print(u'')
-                    print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-                    print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
-                    print(u'  Error: ' + error_message)
+            if successful:
+                print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
+            for ticket_number, error_message in errors:
+                t = self.trac.load(ticket_number)
+                print(u'')
+                print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+                print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
+                print(u'  Error: ' + error_message)
 
     def close_ticket(self, commit, ticket):
         if ticket.commit != commit.sha1:
