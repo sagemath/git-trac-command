@@ -192,6 +192,13 @@ class ReleaseApplication(Application):
             self._commit(commit_message)
 
     def merge_multiple(self, ticket_numbers, limit=0, **kwds):
+        """
+        Create "release" merges
+
+        INPUT:
+
+        - ``ticket_numbers`` -- an iterable
+        """
         successful = []
         errors = []
         try:
@@ -304,34 +311,35 @@ class ReleaseApplication(Application):
                            'milestone!=sage-wishlist'])
         querystr = '&'.join(params)
         ticket_numbers = self.trac.anonymous_proxy.ticket.query(querystr)
-        if not patchbot_statuses:
-            return ticket_numbers
-        return [ticket_number
-                for ticket_number in ticket_numbers
-                if patchbot_status(ticket_number) in patchbot_statuses]
+        for ticket_number in ticket_numbers:
+            if not patchbot_statuses or patchbot_status(ticket_number) in patchbot_statuses:
+                yield ticket_number
 
     def todo(self, milestone=None, statuses=None, patchbot_statuses=None):
         """
         Print a list of tickets that are ready to be merged
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone,
-                                          statuses=statuses, patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
             milestone_str = ''
-        if not tickets:
-            print(u'No tickets {}are ready to be merged'.format(milestone_str))
-            return
-        print(u'The following tickets {}are ready to be merged'.format(milestone_str))
-        for ticket_number in tickets:
+        tickets = []
+        for ticket_number in self._get_ready_tickets(milestone=milestone,
+                                                     statuses=statuses,
+                                                     patchbot_statuses=patchbot_statuses):
+            if not tickets:
+                print(u'The following tickets {}are ready to be merged'.format(milestone_str))
             t = self.trac.load(ticket_number)
             s = patchbot_status(ticket_number)
             print(u'* {ticket.number} {ticket.title} ({ticket.author}) 🤖{patchbot_status}'.format(
                 ticket=t, patchbot_status=s))
-        print(u'Merge tickets with:')
-        print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
+            tickets.append(ticket_number)
+        if not tickets:
+            print(u'No tickets {}are ready to be merged'.format(milestone_str))
+        else:
+            print(u'Merge tickets with:')
+            print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
     def set_ticket_to_needs_work(self, ticket_number, comment):
         if self._trac_context:
