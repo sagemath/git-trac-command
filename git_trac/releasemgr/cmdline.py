@@ -87,18 +87,29 @@ def launch():
     parser_merge_all = subparsers.add_parser('merge-all', help='Merge all tickets that are ready')
     parser_merge_all.add_argument('--limit', dest='limit', type=int,
                                   help='Merge this many tickets', default=0)
-    milestone_help = ('Merge only tickets in this milestone '
-                      '(default: any milestone other than sage-duplicate/invalid/wontfix, '
-                      'sage-feature, sage-pending, sage-wishlist); '
-                      'use "current" for best guess of current milestone')
-    parser_merge_all.add_argument('--milestone', dest='milestone',
-                                  help=milestone_help, default=None)
+    def add_filter_args(parser):
+        milestone_help = ('Only tickets in this milestone '
+                          '(default: any milestone other than sage-duplicate/invalid/wontfix, '
+                          'sage-feature, sage-pending, sage-wishlist); '
+                          'use "current" for best guess of current milestone')
+        parser.add_argument('--milestone', dest='milestone',
+                            help=milestone_help, default=None)
+        status_help = ('Only tickets with this status '
+                       '(default: positive_review)')
+        parser.add_argument('--status', type=str, nargs='*',
+                            help=status_help)
+        patchbot_status_help = ('Only tickets with this patchbot status '
+                                '(TestsPassed, TestsPassedOnRetry, PluginOnlyFailed, Pending, ...) '
+                                '(default: any status)')
+        parser.add_argument('--patchbot-status', type=str, nargs='*',
+                            help=patchbot_status_help)
+    add_filter_args(parser_merge_all)
 
     # git releasemgr print
     parser_confball = subparsers.add_parser('confball', help='Create new confball')
 
     # git releasemgr test
-    parser_test = subparsers.add_parser('test', help='Test merge unreview ticket')
+    parser_test = subparsers.add_parser('test', help='Test merge unreviewed ticket')
     parser_test.add_argument('ticket', type=int, help='Ticket number')
 
     # git releasemgr unmerge
@@ -114,8 +125,7 @@ def launch():
 
     # git releasemgr todo
     parser_todo = subparsers.add_parser('todo', help='Print list of tickets ready to merge')
-    parser_todo.add_argument('--milestone', dest='milestone',
-                             help=milestone_help, default=None)
+    add_filter_args(parser_todo)
 
     # git releasemgr upstream <url>
     parser_upstream = subparsers.add_parser('upstream', help='Upload upstream tarball')
@@ -166,9 +176,9 @@ def launch():
     elif args.subcommand == 'publish':
         app.publish()
     elif args.subcommand == 'todo':
-        app.todo(milestone=args.milestone)
+        app.todo(milestone=args.milestone, statuses=args.status, patchbot_statuses=args.patchbot_status)
     elif args.subcommand == 'merge-all':
-        app.merge_all(args.limit, milestone=args.milestone)
+        app.merge_all(args.limit, milestone=args.milestone, statuses=args.status, patchbot_statuses=args.patchbot_status)
     elif args.subcommand == 'confball':
         app.confball()
     elif args.subcommand == 'upstream':

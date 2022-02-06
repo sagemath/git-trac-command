@@ -17,6 +17,7 @@ from ..people import RELEASE_MANAGER
 from git_trac.logger import logger as log
 from git_trac.git_error import GitError
 from git_trac.releasemgr.version_string import VersionString
+from git_trac.releasemgr.patchbot import patchbot_status
 from git_trac.releasemgr.bootstrap import run_bootstrap
 from git_trac.releasemgr.fileserver_sagemath_org import \
     upload_temp_confball as upload_temp_confball_fileserver
@@ -121,10 +122,10 @@ class ReleaseApplication(Application):
 
         import string
         if not ignore_name:
-            if not all(author[0].strip() in string.ascii_uppercase
+            if not all(author and author[0].strip() in string.ascii_uppercase
                        for author in ticket.author.split(',')):
                 raise ValueError(u'author {0} does not look right'.format(repr(ticket.author)))
-            if not all(reviewer[0].strip() in string.ascii_uppercase
+            if not all(reviewer and reviewer[0].strip() in string.ascii_uppercase
                        for reviewer in ticket.reviewer.split(',')):
                 raise ValueError(u'reviewer {0} does not look right'.format(repr(ticket.reviewer)))
 
@@ -137,7 +138,8 @@ class ReleaseApplication(Application):
         print('Merging ticket...')
         try:
             self.git.echo.merge('FETCH_HEAD', '--no-ff', '--no-commit')
-        except GitError:
+        except GitError as err:
+            print(err)
             # Merge conflicts are recognized below
             pass
 
@@ -189,9 +191,39 @@ class ReleaseApplication(Application):
                 raise ValueError('merge was not clean')
             self._commit(commit_message)
 
-    def merge_multiple(self, ticket_numbers, **kwds):
-        for ticket_number in ticket_numbers:
-            self.merge(ticket_number, **kwds)
+    def merge_multiple(self, ticket_numbers, limit=0, **kwds):
+        """
+        Create "release" merges
+
+        INPUT:
+
+        - ``ticket_numbers`` -- an iterable
+        """
+        successful = []
+        errors = []
+        try:
+            for ticket_number in ticket_numbers:
+                try:
+                    self.merge(ticket_number)
+                    successful.append(ticket_number)
+                except ValueError as err:
+                    errors.append((ticket_number, str(err)))
+                    if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
+                        comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
+                            self.describe().replace('\n', '\n\n'), err)
+                        self.set_ticket_to_needs_work(ticket_number, comment)
+                if limit and (len(successful) >= limit):
+                    break
+        finally:
+            print("\n### Summary ###\n")
+            if successful:
+                print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
+            for ticket_number, error_message in errors:
+                t = self.trac.load(ticket_number)
+                print(u'')
+                print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
+                print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
+                print(u'  Error: ' + error_message)
 
     def close_ticket(self, commit, ticket):
         if ticket.commit != commit.sha1:
@@ -264,8 +296,11 @@ class ReleaseApplication(Application):
             return 'sage-' + milestone
         return milestone
 
-    def _get_ready_tickets(self, milestone=None):
-        params = ['status=positive_review']
+    def _get_ready_tickets(self, milestone=None, statuses=None, patchbot_statuses=None):
+        if statuses is None:
+            statuses = ['positive_review']
+        params = ['status={}'.format(status)
+                  for status in statuses]
         milestone = self._normalize_milestone(milestone)
         if milestone:
             params.append('milestone={0}'.format(milestone))
@@ -275,27 +310,36 @@ class ReleaseApplication(Application):
                            'milestone!=sage-pending',
                            'milestone!=sage-wishlist'])
         querystr = '&'.join(params)
-        return self.trac.anonymous_proxy.ticket.query(querystr)
+        ticket_numbers = self.trac.anonymous_proxy.ticket.query(querystr)
+        for ticket_number in ticket_numbers:
+            if not patchbot_statuses or patchbot_status(ticket_number) in patchbot_statuses:
+                yield ticket_number
 
-    def todo(self, milestone=None):
+    def todo(self, milestone=None, statuses=None, patchbot_statuses=None):
         """
         Print a list of tickets that are ready to be merged
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
             milestone_str = ''
+        tickets = []
+        for ticket_number in self._get_ready_tickets(milestone=milestone,
+                                                     statuses=statuses,
+                                                     patchbot_statuses=patchbot_statuses):
+            if not tickets:
+                print(u'The following tickets {}are ready to be merged'.format(milestone_str))
+            t = self.trac.load(ticket_number)
+            s = patchbot_status(ticket_number)
+            print(u'* {ticket.number} {ticket.title} ({ticket.author}) 🤖{patchbot_status}'.format(
+                ticket=t, patchbot_status=s))
+            tickets.append(ticket_number)
         if not tickets:
             print(u'No tickets {}are ready to be merged'.format(milestone_str))
-            return
-        print(u'The following tickets {}are ready to be merged'.format(milestone_str))
-        for ticket_number in tickets:
-            t = self.trac.load(ticket_number)
-            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-        print(u'Merge tickets with:')
-        print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
+        else:
+            print(u'Merge tickets with:')
+            print(u'git releasemgr merge {0}'.format(' '.join(map(str, tickets))))
 
     def set_ticket_to_needs_work(self, ticket_number, comment):
         if self._trac_context:
@@ -311,12 +355,13 @@ class ReleaseApplication(Application):
         self.git.fetch('trac', 'develop')
         return self.git.log('--oneline', '--first-parent', 'FETCH_HEAD~..HEAD')
 
-    def merge_all(self, limit=0, milestone=None):
+    def merge_all(self, limit=0, milestone=None, statuses=None, patchbot_statuses=None):
         """
         Merge all tickets that are ready
         """
         milestone = self._normalize_milestone(milestone)
-        tickets = self._get_ready_tickets(milestone=milestone)
+        tickets = self._get_ready_tickets(milestone=milestone, statuses=statuses,
+                                          patchbot_statuses=patchbot_statuses)
         if milestone:
             milestone_str = 'for milestone {} '.format(milestone)
         else:
@@ -325,28 +370,7 @@ class ReleaseApplication(Application):
             print(u'No tickets {}are ready to be merged'.format(milestone_str))
             return
         print(u'Merging tickets {}'.format(milestone_str))
-        successful = []
-        errors = []
-        for ticket_number in tickets:
-            try:
-                self.merge(ticket_number)
-                successful.append(ticket_number)
-            except ValueError as err:
-                errors.append((ticket_number, str(err)))
-                if u'ticket dependencies' not in str(err) and u'already merged' not in str(err):
-                    comment = 'Merge failure on top of:\n\n{}\n\n{}'.format(
-                        self.describe().replace('\n', '\n\n'), err)
-                    self.set_ticket_to_needs_work(ticket_number, comment)
-            if limit and (len(successful) >= limit):
-                break
-        if successful:
-            print('Successfully merged: {0}'.format(', '.join(map(str, successful))))
-        for ticket_number, error_message in errors:
-            t = self.trac.load(ticket_number)
-            print(u'')
-            print(u'* {ticket.number} {ticket.title} ({ticket.author})'.format(ticket=t))
-            print(u'  URL: https://trac.sagemath.org/{ticket.number}'.format(ticket=t))
-            print(u'  Error: ' + error_message)
+        return self.merge_multiple(tickets, limit=limit)
 
     def upstream(self, url):
         """
